@@ -8,13 +8,31 @@ use BeycanPress\CryptoPay\Models\AbstractTransaction;
 
 class TransactionsPro extends AbstractTransaction
 {
-    public string $addon = 'gravity_forms';
+    public string $addon = 'gravityforms';
 
     /**
      * @return void
      */
     public function __construct()
     {
-        parent::__construct('gravity_forms_transaction');
+        parent::__construct('gravityforms_transaction');
+    }
+
+    /**
+     * @param int $userId
+     * @param string $formId
+     * @return object
+     */
+    public function findOneByUserAndFormId(int $userId, string $formId): object
+    {
+        return $this->getRow(str_ireplace(
+            ['%d', '%s'],
+            [$userId, $formId],
+            "SELECT * FROM {$this->tableName} 
+            WHERE `userId` = %d
+            AND `params` LIKE '%{\"formId\":\"%s\"}%'
+            ORDER BY `id` DESC
+            LIMIT 1"
+        ));
     }
 }

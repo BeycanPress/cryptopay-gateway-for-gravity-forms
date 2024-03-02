@@ -1,0 +1,459 @@
+<?php
+
+declare(strict_types=1);
+
+namespace BeycanPress\CryptoPay\GravityForms\Gateways;
+
+// @phpcs:disable Generic.Files.InlineHTML
+// @phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+
+use BeycanPress\CryptoPay\Integrator\Hook;
+use BeycanPress\CryptoPay\Integrator\Helpers;
+
+abstract class AbstractGateway extends \GF_Field
+{
+    /**
+     * @var int
+     */
+    // @phpcs:ignore
+    public $type;
+
+    /**
+     * @var int
+     */
+    // @phpcs:ignore
+    public $id;
+
+    /**
+     * @var string
+     */
+    // @phpcs:ignore
+    public $failed_validation = false;
+
+    /**
+     * @var string
+     */
+    // @phpcs:ignore
+    public $validation_message = '';
+
+    /**
+     * @var string
+     */
+    // @phpcs:ignore
+    public $errorMessage = '';
+
+    /**
+     * @var string
+     */
+    // @phpcs:ignore
+    public $theme = '';
+
+    /**
+     * @var bool
+     */
+    // @phpcs:ignore
+    public $setting_field_is_loaded = false;
+
+    /**
+     * @var string
+     */
+    public string $field_input_id = '';
+
+    /**
+     * @param array<mixed> $properties
+     */
+    public function __construct(array $properties = [])
+    {
+        parent::__construct($properties);
+        $this->field_input_id = 'input_' . $this->id;
+
+        // Actions.
+        if (!has_action('gform_editor_js_set_default_values', [$this, 'editor_js_set_default_values'])) {
+            add_action('gform_editor_js_set_default_values', [$this, 'editor_js_set_default_values']);
+        }
+
+        if (!has_action('gform_editor_js', [$this, 'editor_script'])) {
+            add_action('gform_editor_js', [$this, 'editor_script']);
+        }
+
+        add_filter('gform_submit_button', array($this, 'form_submit_button'), 10, 2);
+        // Creating multiple fields, when this fixed, enable this.
+        // add_action('gform_field_standard_settings', [ $this, 'field_standard_settings' ], 10, 2);
+    }
+
+    /**
+     * @param int $formId
+     * @return string
+     */
+    abstract public function run(int $formId): string;
+
+    /**
+     * @return array<string,mixed>
+     */
+    public function get_form_editor_button(): array
+    {
+        return [
+            'group' => 'cryptopay_fields',
+            'text'  => $this->get_form_editor_field_title()
+        ];
+    }
+
+    /**
+     * @param array<string,mixed> $fieldGroups
+     * @return array<string,mixed>
+     */
+    private function add_pay_field_group(array $fieldGroups): array
+    {
+        if (!isset($fieldGroups['cryptopay_fields'])) {
+            $fieldGroups['cryptopay_fields'] = [
+                'name'   => 'cryptopay_fields',
+                'label'  => __('CryptoPay Fields', 'gf-cryptopay'),
+                'fields' => [],
+            ];
+        }
+
+        return $fieldGroups;
+    }
+
+    /**
+     * @param array<string,mixed> $fieldGroups
+     * @return array<string,mixed>
+     */
+    // @phpcs:ignore
+    public function add_button($fieldGroups): array
+    {
+        return parent::add_button(self::add_pay_field_group($fieldGroups));
+    }
+
+    /**
+     * @param int $position
+     * @param int $formId
+     * @return void
+     */
+    // @phpcs:ignore
+    public function field_standard_settings($position, $formId): void
+    {
+        if (10 !== $position) {
+            return;
+        }
+        ?>
+            <li class="cryptopay_field_setting field_setting">
+                <label for="field_cryptopay_theme">
+                    <?php esc_html_e('Choose a theme', 'gf-cryptopay'); ?>
+                </label>
+                <select 
+                    name="field_cryptopay_theme" 
+                    id="field_cryptopay_theme" 
+                    onchange="SetFieldProperty('theme', this.value);"
+                >
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                </select>
+            </li>
+        <?php
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function get_form_editor_field_settings(): array
+    {
+        return array(
+            'cryptopay_field_setting',
+        );
+    }
+
+    /**
+     * @param bool $works
+     * @return string
+     */
+    private function get_field_works_or_expect_msg(bool $works = true): string
+    {
+        $msg = $works
+            ? esc_html__('The %s process will appear on the front-end and the form can be sent when the user completes the payment.', 'gf-cryptopay') // phpcs:ignore
+            : esc_html__('Please add a total field to your form for %s works.', 'gf-cryptopay');
+
+        return sprintf($msg, $this->get_form_editor_field_title());
+    }
+/**
+     * @return void
+     */
+    public function editor_script(): void
+    {
+        ?>  
+            <script>
+                (function ($) {
+                    $(document).ready(() => {
+                        let currentFieldId = 0;
+                        const fieldList = $("#gform_fields");
+                        const fieldSubmit = $("#field_submit");
+                        gform.addAction('gform_page_loaded', function(event, formId, currentPage){
+                            console.log(event, formId, currentPage);
+                        });
+                        $(document).on('gform_field_added', function (event, form, field) {
+                            if (field.type === '<?php echo esc_js($this->type); ?>') {
+                                fieldSubmit.hide();
+                                currentFieldId = parseInt(field.id);
+                            }
+                            if (form.fields.some(field => field.type === 'total')) {
+                                $('#field_' + currentFieldId + ' .ginput_container')?.html(
+                                    '<?php echo $this->get_field_works_or_expect_msg(); ?>'
+                                );
+                            }
+                        });
+                        $(document).on('gform_field_deleted', function (event, form, fieldId) {
+                            if (parseInt(fieldId) === currentFieldId) {
+                                fieldSubmit.show();
+                                currentFieldId = 0;
+                            }
+                            if (!form.fields.some(field => field.type === 'total')) {
+                                $('#field_' + currentFieldId + ' .ginput_container')?.html(
+                                    '<?php echo $this->get_field_works_or_expect_msg(false); ?>'
+                                );
+                            }
+                        });
+                    })
+                })(jQuery);
+            </script>
+        <?php
+    }
+
+    /**
+     * @return void
+     */
+    public function editor_js_set_default_values(): void
+    {
+        ?>  
+            case '<?php echo esc_js($this->type); ?>' :
+                if (!field.label) {
+                    field.label = '<?php echo esc_js($this->get_form_editor_field_title()); ?>';
+                }
+            break;
+        <?php
+    }
+
+    /**
+     * @param array<string,mixed> $form
+     * @param string $value
+     * @param array<string,mixed> $entry
+     * @return string
+     */
+    // @phpcs:ignore
+    public function get_field_input($form, $value = '', $entry = null): string
+    {
+        ob_start();
+        ?>
+        <div class='ginput_container ginput_container_cp_info'>
+            <?php echo $this->get_field_works_or_expect_msg($this->form_hash_total_field($form)); ?>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * @param array<string,mixed> $form
+     * @return bool
+     */
+    private function form_hash_total_field(array $form): bool
+    {
+        return (bool) array_search('total', array_column($form['fields'], 'type'));
+    }
+
+    /**
+     * @param array<string,mixed> $form
+     * @return bool
+     */
+    private function form_has_this_field(array $form): bool
+    {
+        return (bool) array_search($this->id, array_column($form['fields'], 'id'));
+    }
+
+    /**
+     * @param array<string,mixed> $form
+     * @return bool
+     */
+    private function is_this_field_works(array $form): bool
+    {
+        return $this->form_hash_total_field($form) && $this->form_has_this_field($form);
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    private function create_hidden_tx_input(string $value = ''): string
+    {
+        // phpcs:ignore
+        $field = '<input type="hidden" name="' . esc_attr($this->field_input_id) . '" id="' . esc_attr($this->field_input_id) . '" value="' . esc_attr($value) . '" />';
+
+        if ($value != '') {
+            $field .= '<style>.gfield:has(> #' . esc_html($this->field_input_id) . ') {display:none}</style>';
+        }
+
+        return $field;
+    }
+
+    /**
+     * @param array<string,mixed> $form
+     * @param object|null $tx
+     * @return bool
+     */
+    private function is_this_form_needs_payment(array $form, ?object $tx = null): bool
+    {
+        if (!$tx) {
+            $tx = $this->get_tx_with_user_and_form_id(strval($form['id']));
+        }
+
+        if (!$tx) {
+            return true;
+        }
+
+        return (bool) $this->get_entry_with_tx($tx);
+    }
+
+    /**
+     * @param string $formId
+     * @return object|null
+     */
+    private function get_tx_with_user_and_form_id(string $formId): ?object
+    {
+        $model = Helpers::run('getModelByAddon', 'gravityforms');
+        return $model->findOneByUserAndFormId(get_current_user_id(), $formId);
+    }
+    /**
+     * @param object $tx
+     * @return array<mixed>|null
+     */
+    private function get_entry_with_tx(object $tx): ?array
+    {
+        $params = json_decode($tx?->params ?? '');
+        $entries = \GFAPI::get_entries([$params?->formId], [
+            'status' => 'active',
+            'field_filters' => [
+                [
+                    'key' => $this->id,
+                    'value' => $tx->hash,
+                ]
+            ]
+        ]);
+
+        return $entries[0] ?? null;
+    }
+
+    /**
+     * @param string $formId
+     * @return string
+     */
+    private function create_custom_submit_button(string $formId): string
+    {
+        return '<input type="submit" id="gform_submit_button_'.esc_attr($formId).'" class="gform_button button" value="'.esc_attr__('Submit', 'gf-cryptopay').'" onclick="if(window[&quot;gf_submitting_'.esc_attr($formId).'&quot;]){return false;}  if( !jQuery(&quot;#gform_'.esc_attr($formId).'&quot;)[0].checkValidity || jQuery(&quot;#gform_'.esc_attr($formId).'&quot;)[0].checkValidity()){window[&quot;gf_submitting_'.esc_attr($formId).'&quot;]=true;}  " onkeypress="if( event.keyCode == 13 ){ if(window[&quot;gf_submitting_'.esc_attr($formId).'&quot;]){return false;} if( !jQuery(&quot;#gform_'.esc_attr($formId).'&quot;)[0].checkValidity || jQuery(&quot;#gform_'.esc_attr($formId).'&quot;)[0].checkValidity()){window[&quot;gf_submitting_'.esc_attr($formId).'&quot;]=true;}  jQuery(&quot;#gform_'.esc_attr($formId).'&quot;).trigger(&quot;submit&quot;,[true]); }" data-conditional-logic="visible">'; // phpcs:ignore
+    }
+
+    /**
+     * @param string $button
+     * @param array<string> $form
+     * @return string
+     */
+    // @phpcs:ignore
+    public function form_submit_button($button, $form): string
+    {
+        if ($this->is_this_field_works($form) && $this->is_this_form_needs_payment($form)) {
+            return '<div id="custom-submit-placeholder"></div>';
+        }
+
+        return $button;
+    }
+
+    /**
+     * @param string $formId
+     * @param array<string> $deps
+     * @return void
+     */
+    public function custom_enqueue_scripts(string $formId, array $deps): void
+    {
+        wp_enqueue_script(
+            'cryptopay_main_js',
+            GF_CRYPTOPAY_URL . 'assets/js/main.js',
+            array_merge($deps, ['jquery']),
+            GF_CRYPTOPAY_VERSION,
+            true
+        );
+
+        wp_localize_script(
+            'cryptopay_main_js',
+            'gf_cryptopay_vars',
+            array(
+                'fieldId' => $this->id,
+                'fieldInputId' => $this->field_input_id,
+                'currency' => \GFCommon::get_currency(),
+                'submitButton' => $this->create_custom_submit_button($formId),
+                'pleaseFillForm' => esc_html__('Please fill in the required fields in the form before proceeding to the payment step!', 'gf-cryptopay'), // phpcs:ignore
+            )
+        );
+    }
+
+    /**
+     * @param string $value
+     * @param bool $forceFrontendLabel
+     * @param array<string,mixed> $form
+     * @return string
+     */
+    // @phpcs:ignore
+    public function get_field_content($value, $forceFrontendLabel, $form): string
+    {
+        $formId        = absint($form['id']);
+        $adminButtons  = $this->get_admin_buttons();
+        $isEntryDetail = $this->is_entry_detail();
+        $isFormEditor  = $this->is_form_editor();
+        $isAdmin       = $isEntryDetail || $isFormEditor;
+        $fieldLabel    = $this->get_field_label($forceFrontendLabel, $value);
+
+        if ($isAdmin) {
+            return sprintf(
+                "%s<label class='gfield_label' for='%s'>%s</label>{FIELD}",
+                $adminButtons,
+                "input_{$this->id}",
+                esc_html($fieldLabel)
+            );
+        }
+
+        if (!$this->form_hash_total_field($form)) {
+            $msg = esc_html__('Please add a total field to your form for %s works.', 'gf-cryptopay');
+            return sprintf($msg, $this->get_form_editor_field_title());
+        }
+
+        Hook::addFilter('theme', function () {
+            return $this->theme ?? 'light';
+        });
+
+        $tx = $this->get_tx_with_user_and_form_id(strval($formId));
+        $status = $this->is_this_form_needs_payment($form, $tx);
+
+        if (!$status) {
+            return $this->create_hidden_tx_input($tx->hash);
+        }
+
+        $html = $this->run(intval($formId));
+        $html .= $this->create_hidden_tx_input();
+        $this->custom_enqueue_scripts(strval($formId), []);
+
+        return $html;
+    }
+
+    /**
+     * @param string $value
+     * @param array<string,mixed> $form
+     * @return string
+     */
+    // @phpcs:ignore
+    public function validate($value, $form): void
+    {
+        $txHash = sanitize_text_field($_POST[$this->field_input_id] ?? '');
+
+        if (empty($txHash)) {
+            $this->failed_validation  = true;
+            $msg = esc_html__('It looks like the payment was not completed!', 'gf-cryptopay');
+            $this->validation_message = empty($this->errorMessage) ? $msg : $this->errorMessage;
+        }
+    }
+}
