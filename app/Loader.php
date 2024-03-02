@@ -23,6 +23,10 @@ class Loader
             10,
             [
                 'orderId' => function ($tx) {
+                    if (!isset($tx->orderId)) {
+                        return esc_html__('Pending...', 'gf-cryptopay');
+                    }
+
                     return Helpers::run('view', 'components/link', [
                         'url' => sprintf(admin_url('admin.php?page=gf_entries&view=entry&id=%d&lid=%d&order=ASC&filter&paged=1&pos=0&field_id&operator'), $tx->params->formId, $tx->orderId), // @phpcs:ignore
                         'text' => sprintf(esc_html__('View entry #%d', 'gf-cryptopay'), $tx->orderId)
@@ -55,9 +59,9 @@ class Loader
     public function register(): void
     {
         if (Helpers::exists()) {
-            \GF_Fields::register(new Gateways\CryptoPayLite());
+            \GF_Fields::register(new Gateways\Gateway());
         } else {
-            \GF_Fields::register(new Gateways\CryptoPayLite());
+            \GF_Fields::register(new Gateways\GatewayLite());
         }
     }
 }

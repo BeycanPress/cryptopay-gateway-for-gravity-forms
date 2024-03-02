@@ -7,15 +7,15 @@ namespace BeycanPress\CryptoPay\GravityForms\Gateways;
 // @phpcs:disable Generic.Files.InlineHTML
 // @phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
 
-use BeycanPress\CryptoPayLite\Payment;
+use BeycanPress\CryptoPay\Payment;
 
-class CryptoPayLite extends AbstractGateway
+class Gateway extends AbstractGateway
 {
     /**
      * @var string
      */
     // @phpcs:ignore
-    public $type = 'cryptopay_lite';
+    public $type = 'cryptopay';
 
     /**
      * @param array<mixed> $properties
@@ -30,7 +30,7 @@ class CryptoPayLite extends AbstractGateway
      */
     public function get_form_editor_field_title(): string
     {
-        return esc_attr__('CryptoPay Lite', 'gf-cryptopay');
+        return esc_attr__('CryptoPay', 'gf-cryptopay');
     }
 
     /**

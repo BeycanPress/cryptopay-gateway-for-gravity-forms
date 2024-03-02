@@ -475,6 +475,10 @@ abstract class AbstractGateway extends \GF_Field
             return $this->theme ?? 'light';
         });
 
+        Hook::addFilter('theme', function () {
+            return $this->theme ?? 'light';
+        });
+
         $tx = $this->get_tx_with_user_and_form_id(strval($formId));
         $status = $this->is_this_form_needs_payment($form, $tx);
 
