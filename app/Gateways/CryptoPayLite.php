@@ -15,7 +15,7 @@ class CryptoPayLite extends AbstractGateway
      * @var string
      */
     // @phpcs:ignore
-    public $type = 'cryptopay-lite';
+    public $type = 'cryptopay_lite';
 
     /**
      * @param array<mixed> $properties

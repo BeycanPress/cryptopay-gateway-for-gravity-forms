@@ -2,27 +2,53 @@
     $(document).ready(() => {
         let startedApp;
         let oldAmount = 0;
-        const currency = gf_cryptopay_vars.currency;
-        const submitButton = gf_cryptopay_vars.submitButton;
-        const fieldInputId = gf_cryptopay_vars.fieldInputId;
+        let completed = false;
+        const {
+            formId,
+            currency,
+            submitButton,
+            fieldInputId,
+            pleaseFillForm
+        } = window.gf_cryptopay_vars;
 
-        $(".gform_body [aria-required='true']").each(function() {
-            $(this).attr('required', true);
-        });
+        const checkFormEmpty = () => {
+            var isEmpty = false;
+            const el = $('#cryptopay, #cryptopay-lite');
+
+            $('#gform_' + formId).find('[aria-required="true"]').each(function() {
+                var elementType = $(this).prop('tagName').toLowerCase();
+                var value = '';
+                if (elementType === 'input' || elementType === 'select') {
+                    value = $(this).val();
+                } else if (elementType === 'textarea') {
+                    value = $(this).text();
+                } else if (elementType === 'checkbox') {
+                    value = $(this).is(':checked') ? 'checked' : '';
+                }
+                if (!value) {
+                    isEmpty = true;
+                    return false;
+                }
+            });
+        
+            if (isEmpty) {
+                el.hide();
+                if ($('#cpEmptyMessage').length === 0) {
+                    $('<div id="cpEmptyMessage" class="gform_validation_errors" style="text-align:center">' + pleaseFillForm + '</div>').insertBefore(el);
+                }
+            } else {
+                el.show();
+                $('#cpEmptyMessage').remove();
+            }
+        }
+
+        $('#gform_' + formId).on('change', checkFormEmpty);
+        $('#gform_' + formId).on('keyup', checkFormEmpty);
 
         const paymentCompleted = async (ctx, formId) => {
             const form = $('#gform_' + formId);
             const helpers = window.cpHelpers || window.cplHelpers;
             const txHash = ctx.transaction.hash || ctx.transaction.id;
-
-            console.log(ctx)
-            // Modal yapısına geçilecek ve manuel olarak required alan kontrolü yapılacak
-            // Create temporary payment completed record
-            // Submit form
-            // entry'ler ile transactionlar ilişkilendirilecek, 
-            // eğer bir kullanıcıya ve form id'sine ait tx varsa ödeme yapılmıştır sayılacak
-            // ve entry oluşturulduğunda tx ile ilişkilendirilecek
-            // eğer yoksa ödeme yapılması zorunlu olacak
             helpers.closePopup();
             await helpers.sleep(100);
             helpers.successPopup('Payment completed successfully!').then(() => {
@@ -41,11 +67,12 @@
                 // submit form
                 form.find('#custom-submit-placeholder').append(submitButton);
                 form.submit();
+                completed = true;
             });
         }
 
         gform?.addFilter('gform_product_total', function (amount, formId) {
-            if (amount !== oldAmount) {
+            if (amount !== oldAmount && !completed) {
                 oldAmount = amount;
                 if (window.CryptoPayApp) {
                     CryptoPayApp.events.add('confirmationCompleted', async (ctx) => {

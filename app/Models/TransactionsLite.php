@@ -35,4 +35,21 @@ class TransactionsLite extends AbstractTransaction
             LIMIT 1"
         ));
     }
+
+    /**
+     * @param string $hash
+     * @param int $orderId
+     * @return bool
+     */
+    public function updateOrderIdByTxHash(string $hash, int $orderId): bool
+    {
+        return (bool) $this->update(
+            [
+                'orderId' => $orderId,
+            ],
+            [
+                'hash' => $hash,
+            ]
+        );
+    }
 }

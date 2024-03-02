@@ -76,7 +76,8 @@ abstract class AbstractGateway extends \GF_Field
             add_action('gform_editor_js', [$this, 'editor_script']);
         }
 
-        add_filter('gform_submit_button', array($this, 'form_submit_button'), 10, 2);
+        add_filter('gform_submit_button', [$this, 'form_submit_button'], 10, 2);
+        add_filter('gform_entry_post_save', [$this, 'add_entry_id_to_tx'], 10, 2);
         // Creating multiple fields, when this fixed, enable this.
         // add_action('gform_field_standard_settings', [ $this, 'field_standard_settings' ], 10, 2);
     }
@@ -186,13 +187,28 @@ abstract class AbstractGateway extends \GF_Field
                     $(document).ready(() => {
                         let currentFieldId = 0;
                         const fieldList = $("#gform_fields");
-                        const fieldSubmit = $("#field_submit");
-                        gform.addAction('gform_page_loaded', function(event, formId, currentPage){
-                            console.log(event, formId, currentPage);
-                        });
+                        const customSubmit = $(".custom-submit-placeholder");
+                        const customSubmitParent = customSubmit.closest('#field_submit');
+                        if (customSubmitParent) {
+                            customSubmitParent.hide();
+                        }
+
+                        const hideSubmit = () => {
+                            currentFieldId = 0;
+                            customSubmit.hide();
+                            customSubmitParent.hide();
+                            $('#field_submit').hide();
+                        }
+
+                        const showSubmit = () => {
+                            customSubmit.show();
+                            customSubmitParent.show();
+                            $('#field_submit').show();
+                        }
+
                         $(document).on('gform_field_added', function (event, form, field) {
                             if (field.type === '<?php echo esc_js($this->type); ?>') {
-                                fieldSubmit.hide();
+                                hideSubmit()
                                 currentFieldId = parseInt(field.id);
                             }
                             if (form.fields.some(field => field.type === 'total')) {
@@ -203,13 +219,15 @@ abstract class AbstractGateway extends \GF_Field
                         });
                         $(document).on('gform_field_deleted', function (event, form, fieldId) {
                             if (parseInt(fieldId) === currentFieldId) {
-                                fieldSubmit.show();
-                                currentFieldId = 0;
+                                showSubmit();
                             }
                             if (!form.fields.some(field => field.type === 'total')) {
                                 $('#field_' + currentFieldId + ' .ginput_container')?.html(
                                     '<?php echo $this->get_field_works_or_expect_msg(false); ?>'
                                 );
+                            }
+                            if (!form.fields.some(field => field.type === '<?php echo esc_js($this->type); ?>')) {
+                                showSubmit();
                             }
                         });
                     })
@@ -358,10 +376,33 @@ abstract class AbstractGateway extends \GF_Field
     public function form_submit_button($button, $form): string
     {
         if ($this->is_this_field_works($form) && $this->is_this_form_needs_payment($form)) {
-            return '<div id="custom-submit-placeholder"></div>';
+            if (!$this->is_admin_side()) {
+                return '<div id="custom-submit-placeholder"></div>';
+            } else {
+                return '<div class="custom-submit-placeholder" style="display:none">' . $button . '</div>';
+            }
         }
 
         return $button;
+    }
+
+    /**
+     * @param array<string,mixed> $entry
+     * @param array<string,mixed> $form
+     * @return mixed
+     */
+    // @phpcs:ignore
+    public function add_entry_id_to_tx($entry, $form): mixed
+    {
+        if (!$this->form_has_this_field($form)) {
+            return $entry;
+        }
+
+        $model = Helpers::run('getModelByAddon', 'gravityforms');
+        $txHash = sanitize_text_field($_POST[$this->field_input_id] ?? '');
+        $model->updateOrderIdByTxHash($txHash, intval($entry['id']));
+
+        return $entry;
     }
 
     /**
@@ -383,6 +424,7 @@ abstract class AbstractGateway extends \GF_Field
             'cryptopay_main_js',
             'gf_cryptopay_vars',
             array(
+                'formId' => $formId,
                 'fieldId' => $this->id,
                 'fieldInputId' => $this->field_input_id,
                 'currency' => \GFCommon::get_currency(),
@@ -390,6 +432,16 @@ abstract class AbstractGateway extends \GF_Field
                 'pleaseFillForm' => esc_html__('Please fill in the required fields in the form before proceeding to the payment step!', 'gf-cryptopay'), // phpcs:ignore
             )
         );
+    }
+
+    /**
+     * @return bool
+     */
+    private function is_admin_side(): bool
+    {
+        $isEntryDetail = $this->is_entry_detail();
+        $isFormEditor  = $this->is_form_editor();
+        return $isEntryDetail || $isFormEditor;
     }
 
     /**
@@ -401,14 +453,11 @@ abstract class AbstractGateway extends \GF_Field
     // @phpcs:ignore
     public function get_field_content($value, $forceFrontendLabel, $form): string
     {
-        $formId        = absint($form['id']);
-        $adminButtons  = $this->get_admin_buttons();
-        $isEntryDetail = $this->is_entry_detail();
-        $isFormEditor  = $this->is_form_editor();
-        $isAdmin       = $isEntryDetail || $isFormEditor;
-        $fieldLabel    = $this->get_field_label($forceFrontendLabel, $value);
+        $formId       = absint($form['id']);
+        $adminButtons = $this->get_admin_buttons();
+        $fieldLabel   = $this->get_field_label($forceFrontendLabel, $value);
 
-        if ($isAdmin) {
+        if ($this->is_admin_side()) {
             return sprintf(
                 "%s<label class='gfield_label' for='%s'>%s</label>{FIELD}",
                 $adminButtons,

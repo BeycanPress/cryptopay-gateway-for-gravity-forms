@@ -21,12 +21,19 @@ class Loader
             esc_html__('GravityForms transactions', 'gf-cryptopay'),
             'gravityforms',
             10,
-            [],
-            ['orderId']
+            [
+                'orderId' => function ($tx) {
+                    return Helpers::run('view', 'components/link', [
+                        'url' => sprintf(admin_url('admin.php?page=gf_entries&view=entry&id=%d&lid=%d&order=ASC&filter&paged=1&pos=0&field_id&operator'), $tx->params->formId, $tx->orderId), // @phpcs:ignore
+                        'text' => sprintf(esc_html__('View entry #%d', 'gf-cryptopay'), $tx->orderId)
+                    ]);
+                }
+            ],
         );
 
         Hook::addFilter('payment_redirect_urls_gravityforms', [$this, 'paymentRedirectUrls']);
     }
+
 
     /**
      * Payment redirect urls
@@ -35,9 +42,10 @@ class Loader
      */
     public function paymentRedirectUrls(object $data): array
     {
+        $formId = $data->getParams()->get('formId');
         return [
-            'success' => '#',
-            'failed' => 'reload'
+            'success' => '#gform_wrapper_' . $formId,
+            'failed' => '#gform_wrapper_' . $formId
         ];
     }
 
