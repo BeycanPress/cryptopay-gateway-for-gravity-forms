@@ -80,6 +80,39 @@ class PaymentAddon extends \GFPaymentAddOn
     }
 
     /**
+     * @return array<string,mixed>
+     */
+    public function feed_list_columns(): array
+    {
+        return array(
+            'feedName' => esc_html__('Name', 'gf-cryptopay'),
+        );
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    public function feed_settings_fields(): array
+    {
+        return array(
+            array(
+                'description' => '',
+                'fields'      => array(
+                    array(
+                        'name'     => 'feedName',
+                        'label'    => esc_html__('Name', 'gf-cryptopay'),
+                        'type'     => 'text',
+                        'class'    => 'medium',
+                        'required' => true,
+                        'tooltip'  => '<h6>' . esc_html__('Name', 'gravityforms') . '</h6>' . esc_html__('Enter a feed name to uniquely identify this setup.', 'gf-cryptopay') // phpcs:ignore
+                    ),
+                )
+            )
+        );
+    }
+
+
+    /**
      * @return void
      */
     public function init_frontend(): void
@@ -130,6 +163,12 @@ class PaymentAddon extends \GFPaymentAddOn
         $type = $feed['meta']['version'];
         $ourFieldIndex = array_search($type, array_column($form['fields'], 'type'));
         $ourField = $ourFieldIndex ? $form['fields'][$ourFieldIndex] : null;
+        if (!$ourField) {
+            return [
+                'is_authorized' => true,
+                'error_message' => esc_html__('The payment field is not found!', 'gf-cryptopay')
+            ];
+        }
         $txId = $ourField ? sanitize_text_field($_POST[$ourField->field_input_id] ?? '') : '';
         $tx = Helpers::run('getModelByAddon', 'gravityforms')->findOneBy(['hash' => $txId]);
 
@@ -161,6 +200,15 @@ class PaymentAddon extends \GFPaymentAddOn
     // @phpcs:ignore
     public function capture($auth, $feed, $data, $form, $entry): array
     {
+        if (!isset($auth['transaction_id'])) {
+            return [
+                'is_success' => false,
+                'error_message' => $auth['error_message'] ?? esc_html__(
+                    'The transaction id is not found!',
+                    'gf-cryptopay'
+                )
+            ];
+        }
         return [
             'is_success' => true,
             'amount' => $data['payment_amount'],

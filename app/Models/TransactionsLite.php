@@ -44,7 +44,7 @@ class TransactionsLite extends AbstractTransaction
     {
         $this->update(
             [
-                'params' => '{}'
+                'params' => json_encode(['formIdOld' => $formId]),
             ],
             [
                 'params' => json_encode(['formId' => $formId]),

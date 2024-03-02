@@ -29,8 +29,9 @@ class Loader
                         return esc_html__('Pending...', 'gf-cryptopay');
                     }
 
+                    $formId = $tx->params?->formId ?? $tx->params?->formIdOld;
                     return Helpers::run('view', 'components/link', [
-                        'url' => sprintf(admin_url('admin.php?page=gf_entries&view=entry&id=%d&lid=%d&order=ASC&filter&paged=1&pos=0&field_id&operator'), $tx->params->formId, $tx->orderId), // @phpcs:ignore
+                        'url' => sprintf(admin_url('admin.php?page=gf_entries&view=entry&id=%d&lid=%d&order=ASC&filter&paged=1&pos=0&field_id&operator'), $formId, $tx->orderId), // @phpcs:ignore
                         'text' => sprintf(esc_html__('View entry #%d', 'gf-cryptopay'), $tx->orderId)
                     ]);
                 }
