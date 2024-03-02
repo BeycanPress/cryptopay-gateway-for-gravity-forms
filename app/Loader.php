@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BeycanPress\CryptoPay\GravityForms;
 
+// @phpcs:disable Generic.Files.InlineHTML
+
 use BeycanPress\CryptoPay\Integrator\Hook;
 use BeycanPress\CryptoPay\Integrator\Helpers;
 
@@ -36,8 +38,37 @@ class Loader
         );
 
         Hook::addFilter('payment_redirect_urls_gravityforms', [$this, 'paymentRedirectUrls']);
+        add_action('gform_field_standard_settings', [ $this, 'field_standard_settings' ], 10, 2);
     }
 
+
+    /**
+     * @param int $position
+     * @param int $formId
+     * @return void
+     */
+    // @phpcs:ignore
+    public function field_standard_settings($position, $formId): void
+    {
+        if ($position !== 0) {
+            return;
+        }
+        ?>
+            <li class="cryptopay_field_setting field_setting">
+                <label for="field_cryptopay_theme">
+                    <?php esc_html_e('Choose a theme', 'gf-cryptopay'); ?>
+                </label>
+                <select 
+                    name="field_cryptopay_theme" 
+                    id="field_cryptopay_theme" 
+                    onchange="SetFieldProperty('theme', this.value);"
+                >
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                </select>
+            </li>
+        <?php
+    }
 
     /**
      * Payment redirect urls
@@ -58,6 +89,9 @@ class Loader
      */
     public function register(): void
     {
+        \GFForms::include_payment_addon_framework();
+        \GFAddOn::register(Gateways\PaymentAddon::class);
+
         if (Helpers::exists()) {
             \GF_Fields::register(new Gateways\Gateway());
         } else {

@@ -37,6 +37,22 @@ class TransactionsLite extends AbstractTransaction
     }
 
     /**
+     * @param string $formId
+     * @return void
+     */
+    public function cleanFormIdsInTxs(string $formId): void
+    {
+        $this->update(
+            [
+                'params' => '{}'
+            ],
+            [
+                'params' => json_encode(['formId' => $formId]),
+            ]
+        );
+    }
+
+    /**
      * @param string $hash
      * @param int $orderId
      * @return bool

@@ -49,12 +49,6 @@ abstract class AbstractGateway extends \GF_Field
     public $theme = '';
 
     /**
-     * @var bool
-     */
-    // @phpcs:ignore
-    public $setting_field_is_loaded = false;
-
-    /**
      * @var string
      */
     public string $field_input_id = '';
@@ -78,8 +72,7 @@ abstract class AbstractGateway extends \GF_Field
 
         add_filter('gform_submit_button', [$this, 'form_submit_button'], 10, 2);
         add_filter('gform_entry_post_save', [$this, 'add_entry_id_to_tx'], 10, 2);
-        // Creating multiple fields, when this fixed, enable this.
-        // add_action('gform_field_standard_settings', [ $this, 'field_standard_settings' ], 10, 2);
+        add_action('gform_after_delete_field', [$this, 'clean_form_ids_in_txs'], 10, 2);
     }
 
     /**
@@ -124,34 +117,6 @@ abstract class AbstractGateway extends \GF_Field
     public function add_button($fieldGroups): array
     {
         return parent::add_button(self::add_pay_field_group($fieldGroups));
-    }
-
-    /**
-     * @param int $position
-     * @param int $formId
-     * @return void
-     */
-    // @phpcs:ignore
-    public function field_standard_settings($position, $formId): void
-    {
-        if (10 !== $position) {
-            return;
-        }
-        ?>
-            <li class="cryptopay_field_setting field_setting">
-                <label for="field_cryptopay_theme">
-                    <?php esc_html_e('Choose a theme', 'gf-cryptopay'); ?>
-                </label>
-                <select 
-                    name="field_cryptopay_theme" 
-                    id="field_cryptopay_theme" 
-                    onchange="SetFieldProperty('theme', this.value);"
-                >
-                    <option value="light">Light</option>
-                    <option value="dark">Dark</option>
-                </select>
-            </li>
-        <?php
     }
 
     /**
@@ -407,6 +372,17 @@ abstract class AbstractGateway extends \GF_Field
 
     /**
      * @param string $formId
+     * @param string $fieldId
+     * @return void
+     */
+    // @phpcs:ignore
+    public function clean_form_ids_in_txs($formId, $fieldId): void
+    {
+        Helpers::run('getModelByAddon', 'gravityforms')->cleanFormIdsInTxs(strval($formId));
+    }
+
+    /**
+     * @param string $formId
      * @param array<string> $deps
      * @return void
      */
@@ -505,7 +481,7 @@ abstract class AbstractGateway extends \GF_Field
 
         if (empty($txHash)) {
             $this->failed_validation  = true;
-            $msg = esc_html__('It looks like the payment was not completed!', 'gf-cryptopay');
+            $msg = esc_html__('A transaction id was not found, please complete the payment process!', 'gf-cryptopay');
             $this->validation_message = empty($this->errorMessage) ? $msg : $this->errorMessage;
         }
     }
