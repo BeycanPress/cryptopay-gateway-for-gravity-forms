@@ -111,7 +111,6 @@ class PaymentAddon extends \GFPaymentAddOn
         );
     }
 
-
     /**
      * @return void
      */
@@ -134,19 +133,6 @@ class PaymentAddon extends \GFPaymentAddOn
         $feeds[$ourFeedIndex]['meta']['transactionType'] = 'product';
         return $feeds;
     }
-
-    // /**
-    //  * @param array<string,mixed> $feed
-    //  * @param array<string,mixed> $submissionData
-    //  * @param array<string,mixed> $form
-    //  * @param array<string,mixed> $entry
-    //  * @return string
-    //  */
-    // // @phpcs:ignore
-    // public function redirect_url($feed, $submissionData, $form, $entry): string
-    // {
-    //     return 'https://google.com';
-    // }
 
     /**
      * @param array<string,mixed> $feed

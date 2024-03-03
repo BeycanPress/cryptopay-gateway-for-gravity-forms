@@ -21,9 +21,9 @@ class TransactionsPro extends AbstractTransaction
     /**
      * @param int $userId
      * @param string $formId
-     * @return object
+     * @return object|null
      */
-    public function findOneByUserAndFormId(int $userId, string $formId): object
+    public function findOneByUserAndFormId(int $userId, string $formId): ?object
     {
         return $this->getRow(str_ireplace(
             ['%d', '%s'],

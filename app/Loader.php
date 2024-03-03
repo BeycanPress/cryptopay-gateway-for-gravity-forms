@@ -8,6 +8,8 @@ namespace BeycanPress\CryptoPay\GravityForms;
 
 use BeycanPress\CryptoPay\Integrator\Hook;
 use BeycanPress\CryptoPay\Integrator\Helpers;
+use BeycanPress\CryptoPay\Pages\TransactionPage;
+use BeycanPress\CryptoPayLite\Pages\TransactionPage as TransactionPageLite;
 
 class Loader
 {
@@ -16,10 +18,23 @@ class Loader
      */
     public function __construct()
     {
-        add_action('gform_loaded', [$this, 'register'], 5);
-
+        $this->registerTransactionListPages();
         Helpers::registerIntegration('gravityforms');
-        Helpers::createTransactionPage(
+        add_action('gform_loaded', [$this, 'register'], 5);
+        Hook::addFilter('payment_redirect_urls_gravityforms', [$this, 'paymentRedirectUrls']);
+        add_action('gform_field_standard_settings', [ $this, 'fieldStandardSettings' ], 10, 2);
+    }
+
+    /**
+     * @return void
+     */
+    public function registerTransactionListPages(): void
+    {
+        if (!is_admin()) {
+            return;
+        }
+
+        $args = [
             esc_html__('GravityForms transactions', 'gf-cryptopay'),
             'gravityforms',
             10,
@@ -36,12 +51,14 @@ class Loader
                     ]);
                 }
             ],
-        );
+        ];
 
-        Hook::addFilter('payment_redirect_urls_gravityforms', [$this, 'paymentRedirectUrls']);
-        add_action('gform_field_standard_settings', [ $this, 'field_standard_settings' ], 10, 2);
+        if (Helpers::exists()) {
+            new TransactionPage(...$args);
+        } else {
+            new TransactionPageLite(...$args);
+        }
     }
-
 
     /**
      * @param int $position
@@ -49,7 +66,7 @@ class Loader
      * @return void
      */
     // @phpcs:ignore
-    public function field_standard_settings($position, $formId): void
+    public function fieldStandardSettings($position, $formId): void
     {
         if ($position !== 0) {
             return;
