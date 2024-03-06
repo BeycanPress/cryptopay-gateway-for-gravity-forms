@@ -124,9 +124,7 @@ abstract class AbstractGateway extends \GF_Field
      */
     public function get_form_editor_field_settings(): array
     {
-        return array(
-            'cryptopay_field_setting',
-        );
+        return ['cryptopay_field_setting'];
     }
 
     /**
@@ -269,7 +267,7 @@ abstract class AbstractGateway extends \GF_Field
         // phpcs:ignore
         $field = '<input type="hidden" name="' . esc_attr($this->field_input_id) . '" id="' . esc_attr($this->field_input_id) . '" value="' . esc_attr($value) . '" />';
 
-        if ($value != '') {
+        if ('' != $value) {
             $field .= '<style>.gfield:has(> #' . esc_html($this->field_input_id) . ') {display:none}</style>';
         }
 
@@ -399,14 +397,14 @@ abstract class AbstractGateway extends \GF_Field
         wp_localize_script(
             'cryptopay_main_js',
             'gf_cryptopay_vars',
-            array(
+            [
                 'formId' => $formId,
                 'fieldId' => $this->id,
                 'fieldInputId' => $this->field_input_id,
                 'currency' => \GFCommon::get_currency(),
                 'submitButton' => $this->create_custom_submit_button($formId),
                 'pleaseFillForm' => esc_html__('Please fill in the required fields in the form before proceeding to the payment step!', 'gf-cryptopay'), // phpcs:ignore
-            )
+            ]
         );
     }
 

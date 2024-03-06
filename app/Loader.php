@@ -68,7 +68,7 @@ class Loader
     // @phpcs:ignore
     public function fieldStandardSettings($position, $formId): void
     {
-        if ($position !== 0) {
+        if (0 !== $position) {
             return;
         }
         ?>

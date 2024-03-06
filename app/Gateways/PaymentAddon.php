@@ -84,9 +84,9 @@ class PaymentAddon extends \GFPaymentAddOn
      */
     public function feed_list_columns(): array
     {
-        return array(
+        return [
             'feedName' => esc_html__('Name', 'gf-cryptopay'),
-        );
+        ];
     }
 
     /**
@@ -94,21 +94,21 @@ class PaymentAddon extends \GFPaymentAddOn
      */
     public function feed_settings_fields(): array
     {
-        return array(
-            array(
+        return [
+            [
                 'description' => '',
-                'fields'      => array(
-                    array(
+                'fields'      => [
+                    [
                         'name'     => 'feedName',
                         'label'    => esc_html__('Name', 'gf-cryptopay'),
                         'type'     => 'text',
                         'class'    => 'medium',
                         'required' => true,
                         'tooltip'  => '<h6>' . esc_html__('Name', 'gravityforms') . '</h6>' . esc_html__('Enter a feed name to uniquely identify this setup.', 'gf-cryptopay') // phpcs:ignore
-                    ),
-                )
-            )
-        );
+                    ],
+                ]
+            ]
+        ];
     }
 
     /**
@@ -163,7 +163,7 @@ class PaymentAddon extends \GFPaymentAddOn
             $msg = esc_html__('A transaction was not found, please complete the payment process!', 'gf-cryptopay');
         }
 
-        if ($tx && $tx->getStatus()->getValue() != 'verified') {
+        if ($tx && 'verified' != $tx->getStatus()->getValue()) {
             $auth = false;
             $msg = esc_html__('The transaction is not verified yet, please wait for the confirmation!', 'gf-cryptopay');
         }
