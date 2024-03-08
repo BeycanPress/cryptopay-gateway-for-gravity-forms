@@ -73,8 +73,8 @@
                 <?php if (isset($order['amount'])): ?>
                     <p><strong><?php echo esc_html__('Amount') ?>:</strong> <?php echo esc_html($order['amount']) ?> <?php echo esc_html($order['currency']) ?></p>
                 <?php endif; ?>
-                <?php if (isset($addon)): ?>
-                    <p><strong><?php echo esc_html__('Addon') ?>:</strong> <?php echo esc_html($addon) ?></p>
+                <?php if (isset($addonName)): ?>
+                    <p><strong><?php echo esc_html__('Addon') ?>:</strong> <?php echo esc_html($addonName) ?></p>
                 <?php endif; ?>
                 <p>
                 <?php echo esc_html__('This page is the single payment page, after you make your payment on this page you will be returned to the addon\'s page that redirected you to this page.') ?>

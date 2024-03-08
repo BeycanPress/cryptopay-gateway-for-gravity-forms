@@ -11,6 +11,7 @@ use BeycanPress\CryptoPay\Helpers as ProHelpers;
 use BeycanPress\CryptoPay\Pages\TransactionPage;
 use BeycanPress\CryptoPay\Types\Order\OrderType;
 use BeycanPress\CryptoPay\PluginHero\Http\Response;
+use BeycanPress\CryptoPay\Types\Transaction\ParamsType;
 // Lite
 use BeycanPress\CryptoPayLite\Loader as LiteLoader;
 use BeycanPress\CryptoPayLite\Payment as LitePayment;
@@ -19,6 +20,7 @@ use BeycanPress\CryptoPayLite\PluginHero\Hook as LiteHook;
 use BeycanPress\CryptoPayLite\Types\Order\OrderType as LiteOrderType;
 use BeycanPress\CryptoPayLite\PluginHero\Http\Response as LiteResponse;
 use BeycanPress\CryptoPayLite\Pages\TransactionPage as LiteTransactionPage;
+use BeycanPress\CryptoPayLite\Types\Transaction\ParamsType as LiteParamsType;
 
 class Helpers
 {
@@ -189,9 +191,13 @@ class Helpers
         if ($token && Session::has($token)) {
             extract(Session::get($token));
             if (Type::PRO === $type) {
-                $cryptopay = self::createProPayment($addon, (array) $order);
+                $cryptopay = self::createProPayment($addon, (array) $order, [
+                    'token' => $token
+                ]);
             } else {
-                $cryptopay = self::createLitePayment($addon, (array) $order);
+                $cryptopay = self::createLitePayment($addon, (array) $order, [
+                    'token' => $token
+                ]);
             }
             require dirname(__DIR__) . '/views/pay.php';
             exit;
@@ -201,20 +207,36 @@ class Helpers
     /**
      * @param string $addon
      * @param array<mixed> $order
+     * @param array<mixed> $params
      * @return string
      */
-    public static function createProPayment(string $addon, array $order): string
+    public static function createProPayment(string $addon, array $order, array $params = []): string
     {
-        return (new Payment($addon))->setOrder(OrderType::fromArray($order))->html(loading:true);
+        return (new Payment($addon))
+        ->setOrder(
+            OrderType::fromArray($order)
+        )
+        ->setParams(
+            ParamsType::fromArray($params)
+        )
+        ->html(loading:true);
     }
 
     /**
      * @param string $addon
      * @param array<mixed> $order
+     * @param array<mixed> $params
      * @return string
      */
-    public static function createLitePayment(string $addon, array $order): string
+    public static function createLitePayment(string $addon, array $order, array $params = []): string
     {
-        return (new LitePayment($addon))->setOrder(LiteOrderType::fromArray($order))->html(loading:true);
+        return (new LitePayment($addon))
+        ->setOrder(
+            LiteOrderType::fromArray($order)
+        )
+        ->setParams(
+            LiteParamsType::fromArray($params)
+        )
+        ->html(loading:true);
     }
 }
