@@ -42,15 +42,19 @@ Helpers::registerLiteModel(BeycanPress\CryptoPay\GravityForms\Models\Transaction
 
 load_plugin_textdomain('gf-cryptopay', false, basename(__DIR__) . '/languages');
 
-if (!defined('GF_MIN_WP_VERSION')) {
-    add_action('admin_notices', function (): void {
-        ?>
-            <div class="notice notice-error">
-                <p><?php echo sprintf(esc_html__('Gravity Forms - CryptoPay Gateway: This plugin requires Gravity Forms to work. You can buy Gravity Forms by %s.', 'gf-cryptopay'), '<a href="https://www.gravityforms.com/" target="_blank">' . esc_html__('clicking here', 'gf-cryptopay') . '</a>'); ?></p>
-            </div>
-        <?php
-    });
-} elseif (Helpers::bothExists()) {
+add_action('plugins_loaded', function (): void {
+    if (!defined('GF_MIN_WP_VERSION')) {
+        add_action('admin_notices', function (): void {
+            ?>
+                <div class="notice notice-error">
+                    <p><?php echo sprintf(esc_html__('Gravity Forms - CryptoPay Gateway: This plugin requires Gravity Forms to work. You can buy Gravity Forms by %s.', 'gf-cryptopay'), '<a href="https://www.gravityforms.com/" target="_blank">' . esc_html__('clicking here', 'gf-cryptopay') . '</a>'); ?></p>
+                </div>
+            <?php
+        });
+    }
+});
+
+if (Helpers::bothExists()) {
     new BeycanPress\CryptoPay\GravityForms\Loader();
 } else {
     add_action('admin_notices', function (): void {
