@@ -43,7 +43,9 @@ Helpers::registerLiteModel(BeycanPress\CryptoPay\GravityForms\Models\Transaction
 load_plugin_textdomain('gf-cryptopay', false, basename(__DIR__) . '/languages');
 
 add_action('plugins_loaded', function (): void {
-    Helpers::requirePluginMessage('Gravity Forms', 'https://www.gravityforms.com/', false);
+    if (!defined('GF_MIN_WP_VERSION')) {
+        Helpers::requirePluginMessage('Gravity Forms', 'https://www.gravityforms.com/', false);
+    }
 });
 
 if (Helpers::bothExists()) {
