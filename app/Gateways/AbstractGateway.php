@@ -176,7 +176,7 @@ abstract class AbstractGateway extends \GF_Field
                             }
                             if (form.fields.some(field => field.type === 'total')) {
                                 $('#field_' + currentFieldId + ' .ginput_container')?.html(
-                                    '<?php echo $this->get_field_works_or_expect_msg(); ?>'
+                                    '<?php echo esc_js($this->get_field_works_or_expect_msg()); ?>'
                                 );
                             }
                         });
@@ -186,7 +186,7 @@ abstract class AbstractGateway extends \GF_Field
                             }
                             if (!form.fields.some(field => field.type === 'total')) {
                                 $('#field_' + currentFieldId + ' .ginput_container')?.html(
-                                    '<?php echo $this->get_field_works_or_expect_msg(false); ?>'
+                                    '<?php echo esc_js($this->get_field_works_or_expect_msg(false)); ?>'
                                 );
                             }
                             if (!form.fields.some(field => field.type === '<?php echo esc_js($this->type); ?>')) {
@@ -225,7 +225,7 @@ abstract class AbstractGateway extends \GF_Field
         ob_start();
         ?>
         <div class='ginput_container ginput_container_cp_info'>
-            <?php echo $this->get_field_works_or_expect_msg($this->form_hash_total_field($form)); ?>
+            <?php echo esc_html($this->get_field_works_or_expect_msg($this->form_hash_total_field($form))); ?>
         </div>
         <?php
         return ob_get_clean();
