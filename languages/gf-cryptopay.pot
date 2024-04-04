@@ -1,7 +1,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Gravity Forms - CryptoPay Gateway\n"
+"Project-Id-Version: CryptoPay Gateway for Gravity Forms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-03 01:19+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -40,8 +40,8 @@ msgstr ""
 msgid "Choose a theme"
 msgstr ""
 
-#: gravity-forms-cryptopay-gateway.php:49
-#: gravity-forms-cryptopay-gateway.php:59
+#: cryptopay-gateway-for-gravity-forms.php:49
+#: cryptopay-gateway-for-gravity-forms.php:59
 msgid "clicking here"
 msgstr ""
 
@@ -62,21 +62,21 @@ msgid "Enter a feed name to uniquely identify this setup."
 msgstr ""
 
 #. Name of the plugin
-msgid "Gravity Forms - CryptoPay Gateway"
+msgid "CryptoPay Gateway for Gravity Forms"
 msgstr ""
 
-#: gravity-forms-cryptopay-gateway.php:59
+#: cryptopay-gateway-for-gravity-forms.php:59
 #, php-format
 msgid ""
-"Gravity Forms - CryptoPay Gateway: This plugin is an extra feature plugin so "
+"CryptoPay Gateway for Gravity Forms: This plugin is an extra feature plugin so "
 "it cannot do anything on its own. It needs CryptoPay to work. You can buy "
 "CryptoPay by %s."
 msgstr ""
 
-#: gravity-forms-cryptopay-gateway.php:49
+#: cryptopay-gateway-for-gravity-forms.php:49
 #, php-format
 msgid ""
-"Gravity Forms - CryptoPay Gateway: This plugin requires Gravity Forms to "
+"CryptoPay Gateway for Gravity Forms: This plugin requires Gravity Forms to "
 "work. You can buy Gravity Forms by %s."
 msgstr ""
 

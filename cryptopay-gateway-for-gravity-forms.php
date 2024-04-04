@@ -10,7 +10,7 @@ defined('ABSPATH') || exit;
 // @phpcs:disable Generic.Files.LineLength
 
 /**
- * Plugin Name: Gravity Forms - CryptoPay Gateway
+ * Plugin Name: CryptoPay Gateway for Gravity Forms
  * Version:     1.0.0
  * Plugin URI:  https://beycanpress.com/cryptopay/
  * Description: Adds Cryptocurrency payment gateway (CryptoPay) for Gravity Forms.
@@ -21,7 +21,7 @@ defined('ABSPATH') || exit;
  * Text Domain: gf-cryptopay
  * Tags: Cryptopay, Cryptocurrency, WooCommerce, WordPress, MetaMask, Trust, Binance, Wallet, Ethereum, Bitcoin, Binance smart chain, Payment, Plugin, Gateway, Moralis, Converter, API, coin market cap, CMC
  * Requires at least: 5.0
- * Tested up to: 6.4.3
+ * Tested up to: 6.5.0
  * Requires PHP: 8.1
 */
 
