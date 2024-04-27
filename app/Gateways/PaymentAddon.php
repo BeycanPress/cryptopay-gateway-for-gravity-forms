@@ -155,6 +155,8 @@ class PaymentAddon extends \GFPaymentAddOn
                 'error_message' => esc_html__('The payment field is not found!', 'gf-cryptopay')
             ];
         }
+
+        // In Gravity Forms process already have nonce process
         $txId = $ourField ? sanitize_text_field($_POST[$ourField->field_input_id] ?? '') : '';
         $tx = Helpers::run('getModelByAddon', 'gravityforms')->findOneBy(['hash' => $txId]);
 
@@ -214,7 +216,7 @@ class PaymentAddon extends \GFPaymentAddOn
             throw new \Exception(
                 \sprintf(
                     'Could not read WordPress admin menu icon from file: %s.',
-                    $file
+                    esc_html($file)
                 )
             );
         }
@@ -225,7 +227,7 @@ class PaymentAddon extends \GFPaymentAddOn
             throw new \Exception(
                 \sprintf(
                     'Could not read WordPress admin menu icon from file: %s.',
-                    $file
+                    esc_html($file)
                 )
             );
         }

@@ -44,10 +44,10 @@ class TransactionsPro extends AbstractTransaction
     {
         $this->update(
             [
-                'params' => json_encode(['formIdOld' => $formId]),
+                'params' => wp_json_encode(['formIdOld' => $formId]),
             ],
             [
-                'params' => json_encode(['formId' => $formId]),
+                'params' => wp_json_encode(['formId' => $formId]),
             ]
         );
     }

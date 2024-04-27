@@ -47,6 +47,7 @@ class Loader
                     $formId = $tx->params?->formId ?? $tx->params?->formIdOld;
                     return Helpers::run('view', 'components/link', [
                         'url' => sprintf(admin_url('admin.php?page=gf_entries&view=entry&id=%d&lid=%d&order=ASC&filter&paged=1&pos=0&field_id&operator'), $formId, $tx->orderId), // @phpcs:ignore
+                        /* translators: %d: transaction id */
                         'text' => sprintf(esc_html__('View entry #%d', 'gf-cryptopay'), $tx->orderId)
                     ]);
                 }

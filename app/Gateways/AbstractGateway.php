@@ -134,7 +134,9 @@ abstract class AbstractGateway extends \GF_Field
     private function get_field_works_or_expect_msg(bool $works = true): string
     {
         $msg = $works
+            /* translators: %s: field title */
             ? esc_html__('The %s process will appear on the front-end and the form can be sent when the user completes the payment.', 'gf-cryptopay') // phpcs:ignore
+            /* translators: %s: field title */
             : esc_html__('Please add a total field to your form for %s works.', 'gf-cryptopay');
 
         return sprintf($msg, $this->get_form_editor_field_title());
@@ -362,6 +364,7 @@ abstract class AbstractGateway extends \GF_Field
         }
 
         $model = Helpers::run('getModelByAddon', 'gravityforms');
+        // In Gravity Forms process already have nonce process
         $txHash = sanitize_text_field($_POST[$this->field_input_id] ?? '');
         $model->updateOrderIdByTxHash($txHash, intval($entry['id']));
 
@@ -433,6 +436,7 @@ abstract class AbstractGateway extends \GF_Field
 
         if ($this->is_admin_side()) {
             return sprintf(
+                /* translators: %s: field label */
                 "%s<label class='gfield_label' for='%s'>%s</label>{FIELD}",
                 $adminButtons,
                 "input_{$this->id}",
@@ -475,6 +479,7 @@ abstract class AbstractGateway extends \GF_Field
     // @phpcs:ignore
     public function validate($value, $form): void
     {
+        // In Gravity Forms process already have nonce process
         $txHash = sanitize_text_field($_POST[$this->field_input_id] ?? '');
 
         if (empty($txHash)) {
