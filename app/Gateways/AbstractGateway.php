@@ -449,12 +449,14 @@ abstract class AbstractGateway extends \GF_Field
             return sprintf($msg, $this->get_form_editor_field_title());
         }
 
-        Hook::addFilter('theme', function () {
-            return $this->theme ?? 'light';
+        Hook::addFilter('theme', function (array $theme) {
+            $theme['mode'] = $this->theme ? $this->theme : 'light';
+            return $theme;
         });
 
-        Hook::addFilter('theme', function () {
-            return $this->theme ?? 'light';
+        Hook::addFilter('theme', function (array $theme) {
+            $theme['mode'] = $this->theme ? $this->theme : 'light';
+            return $theme;
         });
 
         $tx = $this->get_tx_with_user_and_form_id(strval($formId));

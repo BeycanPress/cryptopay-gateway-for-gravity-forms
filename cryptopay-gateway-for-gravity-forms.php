@@ -19,9 +19,9 @@ defined('ABSPATH') || exit;
  * License:     GPLv3
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain: gf-cryptopay
- * Tags: Cryptopay, Cryptocurrency, WooCommerce, WordPress, MetaMask, Trust, Binance, Wallet, Ethereum, Bitcoin, Binance smart chain, Payment, Plugin, Gateway, Moralis, Converter, API, coin market cap, CMC
+ * Tags: Bitcoin, Ethereum, Cryptocurrency, Payments, Gravity Forms
  * Requires at least: 5.0
- * Tested up to: 6.5.0
+ * Tested up to: 6.6
  * Requires PHP: 8.1
 */
 
@@ -37,19 +37,27 @@ define('GF_CRYPTOPAY_SLUG', plugin_basename(__FILE__));
 
 use BeycanPress\CryptoPay\Integrator\Helpers;
 
-Helpers::registerModel(BeycanPress\CryptoPay\GravityForms\Models\TransactionsPro::class);
-Helpers::registerLiteModel(BeycanPress\CryptoPay\GravityForms\Models\TransactionsLite::class);
+/**
+ * @return void
+ */
+function gfCryptoPayRegisterModels(): void
+{
+    Helpers::registerModel(BeycanPress\CryptoPay\GravityForms\Models\TransactionsPro::class);
+    Helpers::registerLiteModel(BeycanPress\CryptoPay\GravityForms\Models\TransactionsLite::class);
+}
+
+gfCryptoPayRegisterModels();
 
 load_plugin_textdomain('gf-cryptopay', false, basename(__DIR__) . '/languages');
 
 add_action('plugins_loaded', function (): void {
+    gfCryptoPayRegisterModels();
+
     if (!defined('GF_MIN_WP_VERSION')) {
         Helpers::requirePluginMessage('Gravity Forms', 'https://www.gravityforms.com/', false);
+    } elseif (Helpers::bothExists()) {
+        new BeycanPress\CryptoPay\GravityForms\Loader();
+    } else {
+        Helpers::requireCryptoPayMessage('Gravity Forms');
     }
 });
-
-if (Helpers::bothExists()) {
-    new BeycanPress\CryptoPay\GravityForms\Loader();
-} else {
-    Helpers::requireCryptoPayMessage('Gravity Forms');
-}

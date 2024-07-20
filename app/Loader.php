@@ -21,8 +21,18 @@ class Loader
         $this->registerTransactionListPages();
         Helpers::registerIntegration('gravityforms');
         add_action('gform_loaded', [$this, 'register'], 5);
+        Hook::addFilter('edit_config_data_gravityforms', [$this, 'disableReminderEmail']);
         Hook::addFilter('payment_redirect_urls_gravityforms', [$this, 'paymentRedirectUrls']);
         add_action('gform_field_standard_settings', [ $this, 'fieldStandardSettings' ], 10, 2);
+    }
+
+    /**
+     * @param object $data
+     * @return object
+     */
+    public function disableReminderEmail(object $data): object
+    {
+        return $data->disableReminderEmail();
     }
 
     /**
