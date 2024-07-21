@@ -2,6 +2,7 @@
     $(document).ready(() => {
         let startedApp;
         let oldAmount = 0;
+        let currentAmount = 0;
         let completed = false;
         const {
             formId,
@@ -31,7 +32,7 @@
                 }
             });
         
-            if (isEmpty) {
+            if (isEmpty || !currentAmount) {
                 el.hide();
                 if ($('#cpEmptyMessage').length === 0) {
                     $('<div id="cpEmptyMessage" class="gform_validation_errors" style="text-align:center">' + pleaseFillForm + '</div>').insertBefore(el);
@@ -46,11 +47,10 @@
         $('#gform_' + formId).on('keyup', checkFormEmpty);
 
         const paymentCompleted = async (ctx, formId) => {
+            ctx.disablePopup = true;
             const form = $('#gform_' + formId);
             const helpers = window.cpHelpers || window.cplHelpers;
             const txHash = ctx.transaction.hash || ctx.transaction.id;
-            helpers.closePopup();
-            await helpers.sleep(100);
             helpers.successPopup('Payment completed successfully!').then(() => {
                 $('.overlay').remove();
                 startedApp.store.payment.$reset();
@@ -72,7 +72,8 @@
         }
 
         gform?.addFilter('gform_product_total', function (amount, formId) {
-            if (amount !== oldAmount && !completed) {
+            currentAmount = amount;
+            if (amount && amount !== oldAmount && !completed) {
                 oldAmount = amount;
                 if (window.CryptoPayApp) {
                     CryptoPayApp.events.add('confirmationCompleted', async (ctx) => {
