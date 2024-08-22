@@ -20,7 +20,6 @@ class Loader
     {
         $this->registerTransactionListPages();
         Helpers::registerIntegration('gravityforms');
-        add_action('gform_loaded', [$this, 'register'], 5);
         Hook::addFilter('edit_config_data_gravityforms', [$this, 'disableReminderEmail']);
         Hook::addFilter('payment_redirect_urls_gravityforms', [$this, 'paymentRedirectUrls']);
         add_action('gform_field_standard_settings', [ $this, 'fieldStandardSettings' ], 10, 2);
@@ -116,7 +115,7 @@ class Loader
     /**
      * @return void
      */
-    public function register(): void
+    public static function register(): void
     {
         \GFForms::include_payment_addon_framework();
         \GFAddOn::register(Gateways\PaymentAddon::class);

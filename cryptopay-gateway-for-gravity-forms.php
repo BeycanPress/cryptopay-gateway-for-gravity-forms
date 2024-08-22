@@ -36,6 +36,7 @@ define('GF_CRYPTOPAY_DIR', plugin_dir_path(__FILE__));
 define('GF_CRYPTOPAY_SLUG', plugin_basename(__FILE__));
 
 use BeycanPress\CryptoPay\Integrator\Helpers;
+use BeycanPress\CryptoPay\GravityForms\Loader;
 
 /**
  * @return void
@@ -50,13 +51,15 @@ gfCryptoPayRegisterModels();
 
 load_plugin_textdomain('gf-cryptopay', false, basename(__DIR__) . '/languages');
 
+add_action('gform_loaded', [Loader::class, 'register'], 5);
+
 add_action('plugins_loaded', function (): void {
     gfCryptoPayRegisterModels();
 
     if (!defined('GF_MIN_WP_VERSION')) {
         Helpers::requirePluginMessage('Gravity Forms', 'https://www.gravityforms.com/', false);
     } elseif (Helpers::bothExists()) {
-        new BeycanPress\CryptoPay\GravityForms\Loader();
+        new Loader();
     } else {
         Helpers::requireCryptoPayMessage('Gravity Forms');
     }

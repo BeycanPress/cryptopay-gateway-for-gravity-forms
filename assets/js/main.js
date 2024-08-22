@@ -43,8 +43,10 @@
             }
         }
 
-        $('#gform_' + formId).on('change', checkFormEmpty);
-        $('#gform_' + formId).on('keyup', checkFormEmpty);
+        const $form = $('#gform_' + formId);
+        $form.on('change', checkFormEmpty);
+        $form.on('keyup', checkFormEmpty);
+        $form.trigger('change');
 
         const paymentCompleted = async (ctx, formId) => {
             ctx.disablePopup = true;
