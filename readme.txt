@@ -34,16 +34,16 @@ See **<a href="https://cryptopay.beycanpress.net/" target="_blank">Demo</a>**
 
 First of all, after installing Gravity Forms, CryptoPay and Integration plugin, you need to create a CryptoPay feed for the form from the form settings you created with Gravity Forms.
 
-<a href="https://ibb.co/fXkxczY"><img src="https://i.ibb.co/wdSzvFN/Screenshot-1.png" alt="Screenshot-1" border="0"></a>
+![Screenshot-1](https://i.ibb.co/wdSzvFN/Screenshot-1.png)
 
 After adding the CryptoPay field in the form creation step, you are ready to receive payments with CryptoPay.
 
-<a href="https://ibb.co/B331GCf"><img src="https://i.ibb.co/tKKdzJH/Screenshot-2.png" alt="Screenshot-2" border="0"></a>
+![Screenshot-2](https://i.ibb.co/tKKdzJH/Screenshot-2.png)
 
 Result:
 
-<a href="https://ibb.co/wNLQYTP"><img src="https://i.ibb.co/FbWYn9y/Screenshot-3.png" alt="Screenshot-3" border="0"></a>
-<a href="https://ibb.co/vc09xxH"><img src="https://i.ibb.co/rQD9GGm/Screenshot-4.png" alt="Screenshot-4" border="0"></a>
+![Screenshot-3](https://i.ibb.co/FbWYn9y/Screenshot-3.png)
+![Screenshot-4](https://i.ibb.co/rQD9GGm/Screenshot-4.png)
 
 = Privacy notices =
 
