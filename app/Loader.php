@@ -44,20 +44,20 @@ class Loader
         }
 
         $args = [
-            esc_html__('GravityForms transactions', 'gf-cryptopay'),
+            esc_html__('GravityForms transactions', 'cryptopay-gateway-for-gravity-forms'),
             'gravityforms',
             10,
             [
                 'orderId' => function ($tx) {
                     if (!isset($tx->orderId)) {
-                        return esc_html__('Pending...', 'gf-cryptopay');
+                        return esc_html__('Pending...', 'cryptopay-gateway-for-gravity-forms');
                     }
 
                     $formId = $tx->params?->formId ?? $tx->params?->formIdOld;
                     return Helpers::run('view', 'components/link', [
                         'url' => sprintf(admin_url('admin.php?page=gf_entries&view=entry&id=%d&lid=%d&order=ASC&filter&paged=1&pos=0&field_id&operator'), $formId, $tx->orderId), // @phpcs:ignore
                         /* translators: %d: transaction id */
-                        'text' => sprintf(esc_html__('View entry #%d', 'gf-cryptopay'), $tx->orderId)
+                        'text' => sprintf(esc_html__('View entry #%d', 'cryptopay-gateway-for-gravity-forms'), $tx->orderId) // @phpcs:ignore
                     ]);
                 }
             ],
@@ -84,7 +84,7 @@ class Loader
         ?>
             <li class="cryptopay_field_setting field_setting">
                 <label for="field_cryptopay_theme">
-                    <?php esc_html_e('Choose a theme', 'gf-cryptopay'); ?>
+                    <?php esc_html_e('Choose a theme', 'cryptopay-gateway-for-gravity-forms'); ?>
                 </label>
                 <select 
                     name="field_cryptopay_theme" 

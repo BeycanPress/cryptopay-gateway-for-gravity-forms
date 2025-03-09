@@ -30,7 +30,7 @@ class Gateway extends AbstractGateway
      */
     public function get_form_editor_field_title(): string
     {
-        return esc_attr__('CryptoPay', 'gf-cryptopay');
+        return esc_attr__('CryptoPay', 'cryptopay-gateway-for-gravity-forms');
     }
 
     /**
@@ -38,7 +38,7 @@ class Gateway extends AbstractGateway
      */
     public function get_form_editor_field_description(): string
     {
-        return esc_attr__('Adds cryptocurrency payments to your form.', 'gf-cryptopay');
+        return esc_attr__('Adds cryptocurrency payments to your form.', 'cryptopay-gateway-for-gravity-forms');
     }
 
     /**

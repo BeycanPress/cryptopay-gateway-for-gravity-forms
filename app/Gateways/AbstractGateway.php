@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BeycanPress\CryptoPay\GravityForms\Gateways;
 
 // @phpcs:disable Generic.Files.InlineHTML
+// @phpcs:disable WordPress.Security.NonceVerification.Missing
 // @phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
 
 use BeycanPress\CryptoPay\Integrator\Hook;
@@ -101,7 +102,7 @@ abstract class AbstractGateway extends \GF_Field
         if (!isset($fieldGroups['cryptopay_fields'])) {
             $fieldGroups['cryptopay_fields'] = [
                 'name'   => 'cryptopay_fields',
-                'label'  => __('CryptoPay Fields', 'gf-cryptopay'),
+                'label'  => __('CryptoPay Fields', 'cryptopay-gateway-for-gravity-forms'),
                 'fields' => [],
             ];
         }
@@ -135,9 +136,9 @@ abstract class AbstractGateway extends \GF_Field
     {
         $msg = $works
             /* translators: %s: field title */
-            ? esc_html__('The %s process will appear on the front-end and the form can be sent when the user completes the payment.', 'gf-cryptopay') // phpcs:ignore
+            ? esc_html__('The %s process will appear on the front-end and the form can be sent when the user completes the payment.', 'cryptopay-gateway-for-gravity-forms') // phpcs:ignore
             /* translators: %s: field title */
-            : esc_html__('Please add a total field to your form for %s works.', 'gf-cryptopay');
+            : esc_html__('Please add a total field to your form for %s works.', 'cryptopay-gateway-for-gravity-forms');
 
         return sprintf($msg, $this->get_form_editor_field_title());
     }
@@ -329,7 +330,7 @@ abstract class AbstractGateway extends \GF_Field
      */
     private function create_custom_submit_button(string $formId): string
     {
-        return '<input type="submit" id="gform_submit_button_'.esc_attr($formId).'" class="gform_button button" value="'.esc_attr__('Submit', 'gf-cryptopay').'" onclick="if(window[&quot;gf_submitting_'.esc_attr($formId).'&quot;]){return false;}  if( !jQuery(&quot;#gform_'.esc_attr($formId).'&quot;)[0].checkValidity || jQuery(&quot;#gform_'.esc_attr($formId).'&quot;)[0].checkValidity()){window[&quot;gf_submitting_'.esc_attr($formId).'&quot;]=true;}  " onkeypress="if( event.keyCode == 13 ){ if(window[&quot;gf_submitting_'.esc_attr($formId).'&quot;]){return false;} if( !jQuery(&quot;#gform_'.esc_attr($formId).'&quot;)[0].checkValidity || jQuery(&quot;#gform_'.esc_attr($formId).'&quot;)[0].checkValidity()){window[&quot;gf_submitting_'.esc_attr($formId).'&quot;]=true;}  jQuery(&quot;#gform_'.esc_attr($formId).'&quot;).trigger(&quot;submit&quot;,[true]); }" data-conditional-logic="visible">'; // phpcs:ignore
+        return '<input type="submit" id="gform_submit_button_'.esc_attr($formId).'" class="gform_button button" value="'.esc_attr__('Submit', 'cryptopay-gateway-for-gravity-forms').'" onclick="if(window[&quot;gf_submitting_'.esc_attr($formId).'&quot;]){return false;}  if( !jQuery(&quot;#gform_'.esc_attr($formId).'&quot;)[0].checkValidity || jQuery(&quot;#gform_'.esc_attr($formId).'&quot;)[0].checkValidity()){window[&quot;gf_submitting_'.esc_attr($formId).'&quot;]=true;}  " onkeypress="if( event.keyCode == 13 ){ if(window[&quot;gf_submitting_'.esc_attr($formId).'&quot;]){return false;} if( !jQuery(&quot;#gform_'.esc_attr($formId).'&quot;)[0].checkValidity || jQuery(&quot;#gform_'.esc_attr($formId).'&quot;)[0].checkValidity()){window[&quot;gf_submitting_'.esc_attr($formId).'&quot;]=true;}  jQuery(&quot;#gform_'.esc_attr($formId).'&quot;).trigger(&quot;submit&quot;,[true]); }" data-conditional-logic="visible">'; // phpcs:ignore
     }
 
     /**
@@ -365,7 +366,7 @@ abstract class AbstractGateway extends \GF_Field
 
         $model = Helpers::run('getModelByAddon', 'gravityforms');
         // In Gravity Forms process already have nonce process
-        $txHash = sanitize_text_field($_POST[$this->field_input_id] ?? '');
+        $txHash = sanitize_text_field(wp_unslash($_POST[$this->field_input_id] ?? ''));
         $model->updateOrderIdByTxHash($txHash, intval($entry['id']));
 
         return $entry;
@@ -406,7 +407,7 @@ abstract class AbstractGateway extends \GF_Field
                 'fieldInputId' => $this->field_input_id,
                 'currency' => \GFCommon::get_currency(),
                 'submitButton' => $this->create_custom_submit_button($formId),
-                'pleaseFillForm' => esc_html__('Please fill in the required fields in the form before proceeding to the payment step!', 'gf-cryptopay'), // phpcs:ignore
+                'pleaseFillForm' => esc_html__('Please fill in the required fields in the form before proceeding to the payment step!', 'cryptopay-gateway-for-gravity-forms'), // phpcs:ignore
             ]
         );
     }
@@ -445,7 +446,8 @@ abstract class AbstractGateway extends \GF_Field
         }
 
         if (!$this->form_hash_total_field($form)) {
-            $msg = esc_html__('Please add a total field to your form for %s works.', 'gf-cryptopay');
+            /* translators: %s: field title */
+            $msg = esc_html__('Please add a total field to your form for %s works.', 'cryptopay-gateway-for-gravity-forms'); // phpcs:ignore
             return sprintf($msg, $this->get_form_editor_field_title());
         }
 
@@ -477,11 +479,11 @@ abstract class AbstractGateway extends \GF_Field
     public function validate($value, $form): void
     {
         // In Gravity Forms process already have nonce process
-        $txHash = sanitize_text_field($_POST[$this->field_input_id] ?? '');
+        $txHash = sanitize_text_field(wp_unslash($_POST[$this->field_input_id] ?? ''));
 
         if (empty($txHash)) {
             $this->failed_validation  = true;
-            $msg = esc_html__('A transaction id was not found, please complete the payment process!', 'gf-cryptopay');
+            $msg = esc_html__('A transaction id was not found, please complete the payment process!', 'cryptopay-gateway-for-gravity-forms'); // phpcs:ignore
             $this->validation_message = empty($this->errorMessage) ? $msg : $this->errorMessage;
         }
     }

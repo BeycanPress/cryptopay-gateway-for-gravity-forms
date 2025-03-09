@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CryptoPay Gateway for Gravity Forms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-03 01:19+0000\n"
+"POT-Creation-Date: 2025-03-09 05:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -13,14 +13,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Loco https://localise.biz/\n"
-"X-Loco-Version: 2.6.6; wp-6.4.3\n"
-"X-Domain: gf-cryptopay"
+"X-Loco-Version: 2.7.1; wp-6.7.1\n"
+"X-Domain: cryptopay-gateway-for-gravity-forms"
 
 #: app/Gateways/AbstractGateway.php:484
 msgid "A transaction id was not found, please complete the payment process!"
 msgstr ""
 
-#: app/Gateways/PaymentAddon.php:177
+#: app/Gateways/PaymentAddon.php:165
 msgid "A transaction was not found, please complete the payment process!"
 msgstr ""
 
@@ -28,7 +28,7 @@ msgstr ""
 msgid "Adds Cryptocurrency payment gateway (CryptoPay) for Gravity Forms."
 msgstr ""
 
-#: app/Gateways/Gateway.php:41 app/Gateways/GatewayLite.php:41
+#: app/Gateways/GatewayLite.php:41 app/Gateways/Gateway.php:41
 msgid "Adds cryptocurrency payments to your form."
 msgstr ""
 
@@ -36,13 +36,8 @@ msgstr ""
 msgid "BeycanPress LLC"
 msgstr ""
 
-#: app/Loader.php:60
+#: app/Loader.php:87
 msgid "Choose a theme"
-msgstr ""
-
-#: cryptopay-gateway-for-gravity-forms.php:49
-#: cryptopay-gateway-for-gravity-forms.php:59
-msgid "clicking here"
 msgstr ""
 
 #: app/Gateways/Gateway.php:33
@@ -53,6 +48,10 @@ msgstr ""
 msgid "CryptoPay Fields"
 msgstr ""
 
+#. Name of the plugin
+msgid "CryptoPay Gateway for Gravity Forms"
+msgstr ""
+
 #: app/Gateways/GatewayLite.php:33
 msgid "CryptoPay Lite"
 msgstr ""
@@ -61,26 +60,7 @@ msgstr ""
 msgid "Enter a feed name to uniquely identify this setup."
 msgstr ""
 
-#. Name of the plugin
-msgid "CryptoPay Gateway for Gravity Forms"
-msgstr ""
-
-#: cryptopay-gateway-for-gravity-forms.php:59
-#, php-format
-msgid ""
-"CryptoPay Gateway for Gravity Forms: This plugin is an extra feature plugin so "
-"it cannot do anything on its own. It needs CryptoPay to work. You can buy "
-"CryptoPay by %s."
-msgstr ""
-
-#: cryptopay-gateway-for-gravity-forms.php:49
-#, php-format
-msgid ""
-"CryptoPay Gateway for Gravity Forms: This plugin requires Gravity Forms to "
-"work. You can buy Gravity Forms by %s."
-msgstr ""
-
-#: app/Loader.php:23
+#: app/Loader.php:47
 msgid "GravityForms transactions"
 msgstr ""
 
@@ -96,16 +76,18 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: app/Loader.php:29
+#: app/Loader.php:53
 msgid "Pending..."
 msgstr ""
 
-#: app/Gateways/AbstractGateway.php:140 app/Gateways/AbstractGateway.php:446
+#. %s: field title
+#. %s: field label
+#: app/Gateways/AbstractGateway.php:140 app/Gateways/AbstractGateway.php:448
 #, php-format
 msgid "Please add a total field to your form for %s works."
 msgstr ""
 
-#: app/Gateways/AbstractGateway.php:408
+#: app/Gateways/AbstractGateway.php:409
 msgid ""
 "Please fill in the required fields in the form before proceeding to the "
 "payment step!"
@@ -115,25 +97,27 @@ msgstr ""
 msgid "Submit"
 msgstr ""
 
-#: app/Gateways/AbstractGateway.php:139
+#. %s: field title
+#: app/Gateways/AbstractGateway.php:138
 #, php-format
 msgid ""
 "The %s process will appear on the front-end and the form can be sent when "
 "the user completes the payment."
 msgstr ""
 
-#: app/Gateways/PaymentAddon.php:169
+#: app/Gateways/PaymentAddon.php:155
 msgid "The payment field is not found!"
 msgstr ""
 
-#: app/Gateways/PaymentAddon.php:206
+#: app/Gateways/PaymentAddon.php:194
 msgid "The transaction id is not found!"
 msgstr ""
 
-#: app/Gateways/PaymentAddon.php:182
+#: app/Gateways/PaymentAddon.php:170
 msgid "The transaction is not verified yet, please wait for the confirmation!"
 msgstr ""
 
-#: app/Loader.php:35
+#. %d: transaction id
+#: app/Loader.php:60
 msgid "View entry #%d"
 msgstr ""

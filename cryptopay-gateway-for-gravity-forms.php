@@ -18,7 +18,7 @@ defined('ABSPATH') || exit;
  * Author URI:  https://beycanpress.com
  * License:     GPLv3
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
- * Text Domain: gf-cryptopay
+ * Text Domain: cryptopay-gateway-for-gravity-forms
  * Tags: Bitcoin, Ethereum, Cryptocurrency, Payments, Gravity Forms
  * Requires at least: 5.0
  * Tested up to: 6.7.1
@@ -48,10 +48,6 @@ function gfCryptoPayRegisterModels(): void
 }
 
 gfCryptoPayRegisterModels();
-
-add_action('init', function (): void {
-    load_plugin_textdomain('gf-cryptopay', false, basename(__DIR__) . '/languages');
-});
 
 add_action('gform_loaded', [Loader::class, 'register'], 5);
 

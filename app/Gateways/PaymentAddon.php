@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BeycanPress\CryptoPay\GravityForms\Gateways;
 
+// @phpcs:disable WordPress.Security.NonceVerification.Missing
 // @phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
 
 use BeycanPress\CryptoPay\Integrator\Helpers;
@@ -85,7 +86,7 @@ class PaymentAddon extends \GFPaymentAddOn
     public function feed_list_columns(): array
     {
         return [
-            'feedName' => esc_html__('Name', 'gf-cryptopay'),
+            'feedName' => esc_html__('Name', 'cryptopay-gateway-for-gravity-forms'),
         ];
     }
 
@@ -100,11 +101,11 @@ class PaymentAddon extends \GFPaymentAddOn
                 'fields'      => [
                     [
                         'name'     => 'feedName',
-                        'label'    => esc_html__('Name', 'gf-cryptopay'),
+                        'label'    => esc_html__('Name', 'cryptopay-gateway-for-gravity-forms'),
                         'type'     => 'text',
                         'class'    => 'medium',
                         'required' => true,
-                        'tooltip'  => '<h6>' . esc_html__('Name', 'gravityforms') . '</h6>' . esc_html__('Enter a feed name to uniquely identify this setup.', 'gf-cryptopay') // phpcs:ignore
+                        'tooltip'  => '<h6>' . esc_html__('Name', 'gravityforms') . '</h6>' . esc_html__('Enter a feed name to uniquely identify this setup.', 'cryptopay-gateway-for-gravity-forms') // phpcs:ignore
                     ],
                 ]
             ]
@@ -152,22 +153,22 @@ class PaymentAddon extends \GFPaymentAddOn
         if (!$ourField) {
             return [
                 'is_authorized' => true,
-                'error_message' => esc_html__('The payment field is not found!', 'gf-cryptopay')
+                'error_message' => esc_html__('The payment field is not found!', 'cryptopay-gateway-for-gravity-forms')
             ];
         }
 
         // In Gravity Forms process already have nonce process
-        $txId = $ourField ? sanitize_text_field($_POST[$ourField->field_input_id] ?? '') : '';
+        $txId = $ourField ? sanitize_text_field(wp_unslash($_POST[$ourField->field_input_id] ?? '')) : '';
         $tx = Helpers::run('getModelByAddon', 'gravityforms')->findOneBy(['hash' => $txId]);
 
         if (!$tx) {
             $auth = false;
-            $msg = esc_html__('A transaction was not found, please complete the payment process!', 'gf-cryptopay');
+            $msg = esc_html__('A transaction was not found, please complete the payment process!', 'cryptopay-gateway-for-gravity-forms'); // phpcs:ignore
         }
 
         if ($tx && 'verified' != $tx->getStatus()->getValue()) {
             $auth = false;
-            $msg = esc_html__('The transaction is not verified yet, please wait for the confirmation!', 'gf-cryptopay');
+            $msg = esc_html__('The transaction is not verified yet, please wait for the confirmation!', 'cryptopay-gateway-for-gravity-forms'); // phpcs:ignore
         }
 
         return [
@@ -193,7 +194,7 @@ class PaymentAddon extends \GFPaymentAddOn
                 'is_success' => false,
                 'error_message' => $auth['error_message'] ?? esc_html__(
                     'The transaction id is not found!',
-                    'gf-cryptopay'
+                    'cryptopay-gateway-for-gravity-forms'
                 )
             ];
         }
