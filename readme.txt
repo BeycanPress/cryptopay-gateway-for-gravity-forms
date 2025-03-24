@@ -2,7 +2,7 @@
 Contributors: BeycanPress
 Tags: Bitcoin, Ethereum, Cryptocurrency, Payments, Gravity Forms
 Requires at least: 5.0
-Tested up to: 6.7.1
+Tested up to: 6.7
 Requires PHP: 8.1
 Stable Tag: 1.0.1
 Version: 1.0.1

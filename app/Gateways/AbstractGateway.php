@@ -87,6 +87,7 @@ abstract class AbstractGateway extends \GF_Field
      */
     public function get_form_editor_button(): array
     {
+        /** @disregard */
         return [
             'group' => 'cryptopay_fields',
             'text'  => $this->get_form_editor_field_title()
@@ -140,81 +141,91 @@ abstract class AbstractGateway extends \GF_Field
             /* translators: %s: field title */
             : esc_html__('Please add a total field to your form for %s works.', 'cryptopay-gateway-for-gravity-forms');
 
+        /** @disregard */
         return sprintf($msg, $this->get_form_editor_field_title());
     }
-/**
+    /**
      * @return void
      */
     public function editor_script(): void
     {
-        ?>  
-            <script>
-                (function ($) {
-                    $(document).ready(() => {
-                        let currentFieldId = 0;
-                        const fieldList = $("#gform_fields");
-                        const customSubmit = $(".custom-submit-placeholder");
-                        const customSubmitParent = customSubmit.closest('#field_submit');
-                        if (customSubmitParent) {
-                            customSubmitParent.hide();
-                        }
+        // phpcs:disable
+        wp_add_inline_script(
+            'crypto-pay-gateway-for-gravity-forms',
+            `;(function ($) {
+                $(document).ready(() => {
+                    let currentFieldId = 0;
+                    const fieldList = $("#gform_fields");
+                    const customSubmit = $(".custom-submit-placeholder");
+                    const customSubmitParent = customSubmit.closest('#field_submit');
+                    if (customSubmitParent) {
+                        customSubmitParent.hide();
+                    }
 
-                        const hideSubmit = () => {
-                            currentFieldId = 0;
-                            customSubmit.hide();
-                            customSubmitParent.hide();
-                            $('#field_submit').hide();
-                        }
+                    const hideSubmit = () => {
+                        currentFieldId = 0;
+                        customSubmit.hide();
+                        customSubmitParent.hide();
+                        $('#field_submit').hide();
+                    }
 
-                        const showSubmit = () => {
-                            customSubmit.show();
-                            customSubmitParent.show();
-                            $('#field_submit').show();
-                        }
+                    const showSubmit = () => {
+                        customSubmit.show();
+                        customSubmitParent.show();
+                        $('#field_submit').show();
+                    }
 
-                        $(document).on('gform_field_added', function (event, form, field) {
-                            if (field.type === '<?php echo esc_js($this->type); ?>') {
-                                hideSubmit()
-                                currentFieldId = parseInt(field.id);
-                            }
-                            if (form.fields.some(field => field.type === 'total')) {
-                                $('#field_' + currentFieldId + ' .ginput_container')?.html(
-                                    '<?php echo esc_js($this->get_field_works_or_expect_msg()); ?>'
-                                );
-                            }
-                        });
-                        $(document).on('gform_field_deleted', function (event, form, fieldId) {
-                            if (parseInt(fieldId) === currentFieldId) {
-                                showSubmit();
-                            }
-                            if (!form.fields.some(field => field.type === 'total')) {
-                                $('#field_' + currentFieldId + ' .ginput_container')?.html(
-                                    '<?php echo esc_js($this->get_field_works_or_expect_msg(false)); ?>'
-                                );
-                            }
-                            if (!form.fields.some(field => field.type === '<?php echo esc_js($this->type); ?>')) {
-                                showSubmit();
-                            }
-                        });
-                    })
-                })(jQuery);
-            </script>
-        <?php
+                    $(document).on('gform_field_added', function (event, form, field) {
+                        if (field.type === '` . esc_js($this->type) . `') {
+                            hideSubmit()
+                            currentFieldId = parseInt(field.id);
+                        }
+                        if (form.fields.some(field => field.type === 'total')) {
+                            $('#field_' + currentFieldId + ' .ginput_container')?.html(
+                                '` . esc_js($this->get_field_works_or_expect_msg()) . `'
+                            );
+                        }
+                    });
+                    $(document).on('gform_field_deleted', function (event, form, fieldId) {
+                        if (parseInt(fieldId) === currentFieldId) {
+                            showSubmit();
+                        }
+                        if (!form.fields.some(field => field.type === 'total')) {
+                            $('#field_' + currentFieldId + ' .ginput_container')?.html(
+                                '` . esc_js($this->get_field_works_or_expect_msg(false)) . `'
+                            );
+                        }
+                        if (!form.fields.some(field => field.type === '` . esc_js($this->type) . `')) {
+                            showSubmit();
+                        }
+                    });
+                })
+            })(jQuery);`,
+            'after'
+        );
+        // phpcs:enable
     }
 
     /**
      * @return void
      */
+    // @phpcs:ignore
     public function editor_js_set_default_values(): void
     {
-        ?>  
-            case '<?php echo esc_js($this->type); ?>' :
-                if (!field.label) {
-                    field.label = '<?php echo esc_js($this->get_form_editor_field_title()); ?>';
-                }
-            break;
+        // phpcs:disable
+        ?>
+        case '<?php echo esc_js($this->type); ?>' :
+            if (!field.label) {
+                field.label = '<?php /** @disregard */ echo esc_js($this->get_form_editor_field_title()); ?>';
+            }
+        break;
         <?php
+        // phpcs:enable
     }
+
+    // @phpcs:disable Generic.Files.InlineHTML
+    // @phpcs:disable WordPress.Security.NonceVerification.Missing
+    // @phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
 
     /**
      * @param array<string,mixed> $form
@@ -227,9 +238,9 @@ abstract class AbstractGateway extends \GF_Field
     {
         ob_start();
         ?>
-        <div class='ginput_container ginput_container_cp_info'>
-            <?php echo esc_html($this->get_field_works_or_expect_msg($this->form_hash_total_field($form))); ?>
-        </div>
+            <div class='ginput_container ginput_container_cp_info'>
+                <?php echo esc_html($this->get_field_works_or_expect_msg($this->form_hash_total_field($form))); ?>
+            </div>
         <?php
         return ob_get_clean();
     }
@@ -271,7 +282,10 @@ abstract class AbstractGateway extends \GF_Field
         $field = '<input type="hidden" name="' . esc_attr($this->field_input_id) . '" id="' . esc_attr($this->field_input_id) . '" value="' . esc_attr($value) . '" />';
 
         if ('' != $value) {
-            $field .= '<style>.gfield:has(> #' . esc_html($this->field_input_id) . ') {display:none}</style>';
+            wp_add_inline_style(
+                'cryptopay-gateway-for-gravity-forms-css',
+                '.gfield:has(> #' . esc_html($this->field_input_id) . ') {display:none}'
+            );
         }
 
         return $field;
@@ -330,7 +344,7 @@ abstract class AbstractGateway extends \GF_Field
      */
     private function create_custom_submit_button(string $formId): string
     {
-        return '<input type="submit" id="gform_submit_button_'.esc_attr($formId).'" class="gform_button button" value="'.esc_attr__('Submit', 'cryptopay-gateway-for-gravity-forms').'" onclick="if(window[&quot;gf_submitting_'.esc_attr($formId).'&quot;]){return false;}  if( !jQuery(&quot;#gform_'.esc_attr($formId).'&quot;)[0].checkValidity || jQuery(&quot;#gform_'.esc_attr($formId).'&quot;)[0].checkValidity()){window[&quot;gf_submitting_'.esc_attr($formId).'&quot;]=true;}  " onkeypress="if( event.keyCode == 13 ){ if(window[&quot;gf_submitting_'.esc_attr($formId).'&quot;]){return false;} if( !jQuery(&quot;#gform_'.esc_attr($formId).'&quot;)[0].checkValidity || jQuery(&quot;#gform_'.esc_attr($formId).'&quot;)[0].checkValidity()){window[&quot;gf_submitting_'.esc_attr($formId).'&quot;]=true;}  jQuery(&quot;#gform_'.esc_attr($formId).'&quot;).trigger(&quot;submit&quot;,[true]); }" data-conditional-logic="visible">'; // phpcs:ignore
+        return '<input type="submit" id="gform_submit_button_' . esc_attr($formId) . '" class="gform_button button" value="' . esc_attr__('Submit', 'cryptopay-gateway-for-gravity-forms') . '" onclick="if(window[&quot;gf_submitting_' . esc_attr($formId) . '&quot;]){return false;}  if( !jQuery(&quot;#gform_' . esc_attr($formId) . '&quot;)[0].checkValidity || jQuery(&quot;#gform_' . esc_attr($formId) . '&quot;)[0].checkValidity()){window[&quot;gf_submitting_' . esc_attr($formId) . '&quot;]=true;}  " onkeypress="if( event.keyCode == 13 ){ if(window[&quot;gf_submitting_' . esc_attr($formId) . '&quot;]){return false;} if( !jQuery(&quot;#gform_' . esc_attr($formId) . '&quot;)[0].checkValidity || jQuery(&quot;#gform_' . esc_attr($formId) . '&quot;)[0].checkValidity()){window[&quot;gf_submitting_' . esc_attr($formId) . '&quot;]=true;}  jQuery(&quot;#gform_' . esc_attr($formId) . '&quot;).trigger(&quot;submit&quot;,[true]); }" data-conditional-logic="visible">'; // phpcs:ignore
     }
 
     /**
@@ -417,7 +431,9 @@ abstract class AbstractGateway extends \GF_Field
      */
     private function is_admin_side(): bool
     {
+        /** @disregard */
         $isEntryDetail = $this->is_entry_detail();
+        /** @disregard */
         $isFormEditor  = $this->is_form_editor();
         return $isEntryDetail || $isFormEditor;
     }
@@ -432,7 +448,9 @@ abstract class AbstractGateway extends \GF_Field
     public function get_field_content($value, $forceFrontendLabel, $form): string
     {
         $formId       = absint($form['id']);
+        /** @disregard */
         $adminButtons = $this->get_admin_buttons();
+        /** @disregard */
         $fieldLabel   = $this->get_field_label($forceFrontendLabel, $value);
 
         if ($this->is_admin_side()) {
@@ -448,6 +466,7 @@ abstract class AbstractGateway extends \GF_Field
         if (!$this->form_hash_total_field($form)) {
             /* translators: %s: field title */
             $msg = esc_html__('Please add a total field to your form for %s works.', 'cryptopay-gateway-for-gravity-forms'); // phpcs:ignore
+            /** @disregard */
             return sprintf($msg, $this->get_form_editor_field_title());
         }
 
