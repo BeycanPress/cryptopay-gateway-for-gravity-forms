@@ -19,7 +19,7 @@ If you're using Gravity Forms on your WordPress site to collect data from users 
 
 Thus, CryptoPay is the ideal plugin for accepting crypto payments on forms created with Gravity Forms.
 
-What is CryptoPay?
+#### What is CryptoPay?
 <iframe width="560" height="315" src="https://www.youtube.com/embed/3vaoFL4XG10" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 #### This plugin is an integration plugin. So basically you need to have the following two plugins.
