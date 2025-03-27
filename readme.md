@@ -12,14 +12,14 @@ First of all, you need to know that this is an integration plugin. So it does no
 
 After installing Gravity Forms, CryptoPay and Integration plugin, you need to create a CryptoPay feed for the form from the form settings you created with Gravity Forms.
 
-![Screenshot-1](https://i.hizliresim.com/7a05wj4.png)
+![Screenshot-1](https://i.imgur.com/8SNJZnX.png)
 
 After adding the CryptoPay field in the form creation step, you are ready to receive payments with CryptoPay.
 
-![Screenshot-2](https://i.hizliresim.com/kpy8uay.png)
+![Screenshot-2](https://i.imgur.com/EVvUlRu.png)
 
 Result:
 
-![Screenshot-3](https://i.hizliresim.com/ncbqe4y.png)
-![Screenshot-4](https://i.hizliresim.com/rug7unv.png)
-![Screenshot-5](https://i.hizliresim.com/b9q23yr.png)
+![Screenshot-3](https://i.imgur.com/JVlVMDl.png)
+![Screenshot-4](https://i.imgur.com/OdkVFsK.png)
+![Screenshot-5](https://i.imgur.com/tHc6nNj.png)
