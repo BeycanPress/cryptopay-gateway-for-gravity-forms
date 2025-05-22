@@ -11,7 +11,7 @@ defined('ABSPATH') || exit;
 
 /**
  * Plugin Name: CryptoPay Gateway for Gravity Forms
- * Version:     1.0.1
+ * Version:     1.0.2
  * Plugin URI:  https://beycanpress.com/cryptopay/
  * Description: Adds Cryptocurrency payment gateway (CryptoPay) for Gravity Forms.
  * Author:      BeycanPress LLC
@@ -21,7 +21,7 @@ defined('ABSPATH') || exit;
  * Text Domain: cryptopay-gateway-for-gravity-forms
  * Tags: Bitcoin, Ethereum, Cryptocurrency, Payments, Gravity Forms
  * Requires at least: 5.0
- * Tested up to: 6.7
+ * Tested up to: 6.8
  * Requires PHP: 8.1
 */
 
@@ -29,7 +29,7 @@ defined('ABSPATH') || exit;
 require_once __DIR__ . '/vendor/autoload.php';
 
 define('GF_CRYPTOPAY_FILE', __FILE__);
-define('GF_CRYPTOPAY_VERSION', '1.0.1');
+define('GF_CRYPTOPAY_VERSION', '1.0.2');
 define('GF_CRYPTOPAY_KEY', basename(__DIR__));
 define('GF_CRYPTOPAY_URL', plugin_dir_url(__FILE__));
 define('GF_CRYPTOPAY_DIR', plugin_dir_path(__FILE__));

@@ -22,7 +22,7 @@ class Loader
         Helpers::registerIntegration('gravityforms');
         Hook::addFilter('edit_config_data_gravityforms', [$this, 'disableReminderEmail']);
         Hook::addFilter('payment_redirect_urls_gravityforms', [$this, 'paymentRedirectUrls']);
-        add_action('gform_field_standard_settings', [ $this, 'fieldStandardSettings' ], 10, 2);
+        add_action('gform_field_standard_settings', [$this, 'fieldStandardSettings'], 10, 2);
     }
 
     /**
@@ -43,31 +43,33 @@ class Loader
             return;
         }
 
-        $args = [
-            esc_html__('GravityForms transactions', 'cryptopay-gateway-for-gravity-forms'),
-            'gravityforms',
-            10,
-            [
-                'orderId' => function ($tx) {
-                    if (!isset($tx->orderId)) {
-                        return esc_html__('Pending...', 'cryptopay-gateway-for-gravity-forms');
+        add_action('init', function (): void {
+            $args = [
+                esc_html__('GravityForms transactions', 'cryptopay-gateway-for-gravity-forms'),
+                'gravityforms',
+                9,
+                [
+                    'orderId' => function ($tx) {
+                        if (!isset($tx->orderId)) {
+                            return esc_html__('Pending...', 'cryptopay-gateway-for-gravity-forms');
+                        }
+
+                        $formId = $tx->params?->formId ?? $tx->params?->formIdOld;
+                        return Helpers::run('view', 'components/link', [
+                            'url' => sprintf(admin_url('admin.php?page=gf_entries&view=entry&id=%d&lid=%d&order=ASC&filter&paged=1&pos=0&field_id&operator'), $formId, $tx->orderId), // @phpcs:ignore
+                            /* translators: %d: transaction id */
+                            'text' => sprintf(esc_html__('View entry #%d', 'cryptopay-gateway-for-gravity-forms'), $tx->orderId) // @phpcs:ignore
+                        ]);
                     }
+                ],
+            ];
 
-                    $formId = $tx->params?->formId ?? $tx->params?->formIdOld;
-                    return Helpers::run('view', 'components/link', [
-                        'url' => sprintf(admin_url('admin.php?page=gf_entries&view=entry&id=%d&lid=%d&order=ASC&filter&paged=1&pos=0&field_id&operator'), $formId, $tx->orderId), // @phpcs:ignore
-                        /* translators: %d: transaction id */
-                        'text' => sprintf(esc_html__('View entry #%d', 'cryptopay-gateway-for-gravity-forms'), $tx->orderId) // @phpcs:ignore
-                    ]);
-                }
-            ],
-        ];
-
-        if (Helpers::exists()) {
-            new TransactionPage(...$args);
-        } else {
-            new TransactionPageLite(...$args);
-        }
+            if (Helpers::exists()) {
+                new TransactionPage(...$args);
+            } else {
+                new TransactionPageLite(...$args);
+            }
+        });
     }
 
     /**
@@ -82,19 +84,18 @@ class Loader
             return;
         }
         ?>
-            <li class="cryptopay_field_setting field_setting">
-                <label for="field_cryptopay_theme">
-                    <?php esc_html_e('Choose a theme', 'cryptopay-gateway-for-gravity-forms'); ?>
-                </label>
-                <select 
-                    name="field_cryptopay_theme" 
-                    id="field_cryptopay_theme" 
-                    onchange="SetFieldProperty('theme', this.value);"
-                >
-                    <option value="light">Light</option>
-                    <option value="dark">Dark</option>
-                </select>
-            </li>
+        <li class="cryptopay_field_setting field_setting">
+            <label for="field_cryptopay_theme">
+                <?php esc_html_e('Choose a theme', 'cryptopay-gateway-for-gravity-forms'); ?>
+            </label>
+            <select
+                name="field_cryptopay_theme"
+                id="field_cryptopay_theme"
+                onchange="SetFieldProperty('theme', this.value);">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+            </select>
+        </li>
         <?php
     }
 
