@@ -18,9 +18,9 @@ class GatewayLite extends AbstractGateway
     public $type = 'cryptopay_lite';
 
     /**
-     * @param array<mixed> $properties
+     * @param mixed $properties
      */
-    public function __construct(array $properties = [])
+    public function __construct(mixed $properties = [])
     {
         parent::__construct($properties);
     }

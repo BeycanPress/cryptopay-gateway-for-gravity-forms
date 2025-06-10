@@ -22,7 +22,7 @@
                 if (elementType === 'input' || elementType === 'select') {
                     value = $(this).val();
                 } else if (elementType === 'textarea') {
-                    value = $(this).text();
+                    value = $(this).text() || $(this).val();
                 } else if (elementType === 'checkbox') {
                     value = $(this).is(':checked') ? 'checked' : '';
                 }

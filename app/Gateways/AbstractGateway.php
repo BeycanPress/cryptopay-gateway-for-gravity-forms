@@ -55,11 +55,14 @@ abstract class AbstractGateway extends \GF_Field
     public string $field_input_id = '';
 
     /**
-     * @param array<mixed> $properties
+     * @param mixed $properties
      */
-    public function __construct(array $properties = [])
+    public function __construct(mixed $properties = [])
     {
-        parent::__construct($properties);
+        if (is_array($properties)) {
+            parent::__construct($properties);
+        }
+
         $this->field_input_id = 'input_' . $this->id;
 
         // Actions.
@@ -150,59 +153,62 @@ abstract class AbstractGateway extends \GF_Field
     public function editor_script(): void
     {
         // phpcs:disable
-        wp_add_inline_script(
-            'crypto-pay-gateway-for-gravity-forms',
-            `;(function ($) {
-                $(document).ready(() => {
-                    let currentFieldId = 0;
-                    const fieldList = $("#gform_fields");
-                    const customSubmit = $(".custom-submit-placeholder");
-                    const customSubmitParent = customSubmit.closest('#field_submit');
-                    if (customSubmitParent) {
-                        customSubmitParent.hide();
-                    }
+        add_action('admin_footer', function () {
+?>
+            <script type="text/javascript">
+                ;
+                (function($) {
+                    $(document).ready(() => {
+                        let currentFieldId = 0;
+                        const fieldList = $("#gform_fields");
+                        const customSubmit = $(".custom-submit-placeholder");
+                        const customSubmitParent = customSubmit.closest('#field_submit');
+                        if (customSubmitParent) {
+                            customSubmitParent.hide();
+                        }
 
-                    const hideSubmit = () => {
-                        currentFieldId = 0;
-                        customSubmit.hide();
-                        customSubmitParent.hide();
-                        $('#field_submit').hide();
-                    }
+                        const hideSubmit = () => {
+                            currentFieldId = 0;
+                            customSubmit.hide();
+                            customSubmitParent.hide();
+                            $('#field_submit').hide();
+                        }
 
-                    const showSubmit = () => {
-                        customSubmit.show();
-                        customSubmitParent.show();
-                        $('#field_submit').show();
-                    }
+                        const showSubmit = () => {
+                            customSubmit.show();
+                            customSubmitParent.show();
+                            $('#field_submit').show();
+                        }
 
-                    $(document).on('gform_field_added', function (event, form, field) {
-                        if (field.type === '` . esc_js($this->type) . `') {
-                            hideSubmit()
-                            currentFieldId = parseInt(field.id);
-                        }
-                        if (form.fields.some(field => field.type === 'total')) {
-                            $('#field_' + currentFieldId + ' .ginput_container')?.html(
-                                '` . esc_js($this->get_field_works_or_expect_msg()) . `'
-                            );
-                        }
-                    });
-                    $(document).on('gform_field_deleted', function (event, form, fieldId) {
-                        if (parseInt(fieldId) === currentFieldId) {
-                            showSubmit();
-                        }
-                        if (!form.fields.some(field => field.type === 'total')) {
-                            $('#field_' + currentFieldId + ' .ginput_container')?.html(
-                                '` . esc_js($this->get_field_works_or_expect_msg(false)) . `'
-                            );
-                        }
-                        if (!form.fields.some(field => field.type === '` . esc_js($this->type) . `')) {
-                            showSubmit();
-                        }
-                    });
-                })
-            })(jQuery);`,
-            'after'
-        );
+                        $(document).on('gform_field_added', function(event, form, field) {
+                            if (field.type === '<?php esc_js($this->type) ?>') {
+                                hideSubmit()
+                                currentFieldId = parseInt(field.id);
+                            }
+                            if (form.fields.some(field => field.type === 'total')) {
+                                $('#field_' + currentFieldId + ' .ginput_container')?.html(
+                                    '<?php esc_js($this->get_field_works_or_expect_msg()) ?>'
+                                );
+                            }
+                        });
+                        $(document).on('gform_field_deleted', function(event, form, fieldId) {
+                            if (parseInt(fieldId) === currentFieldId) {
+                                showSubmit();
+                            }
+                            if (!form.fields.some(field => field.type === 'total')) {
+                                $('#field_' + currentFieldId + ' .ginput_container')?.html(
+                                    '<?php esc_js($this->get_field_works_or_expect_msg(false)) ?>'
+                                );
+                            }
+                            if (!form.fields.some(field => field.type === '<?php esc_js($this->type) ?>')) {
+                                showSubmit();
+                            }
+                        });
+                    })
+                })(jQuery);
+            </script>
+        <?php
+        });
         // phpcs:enable
     }
 
@@ -215,11 +221,11 @@ abstract class AbstractGateway extends \GF_Field
         // phpcs:disable
         ?>
         case '<?php echo esc_js($this->type); ?>' :
-            if (!field.label) {
-                field.label = '<?php /** @disregard */ echo esc_js($this->get_form_editor_field_title()); ?>';
-            }
+        if (!field.label) {
+        field.label = '<?php /** @disregard */ echo esc_js($this->get_form_editor_field_title()); ?>';
+        }
         break;
-        <?php
+    <?php
         // phpcs:enable
     }
 
@@ -238,9 +244,9 @@ abstract class AbstractGateway extends \GF_Field
     {
         ob_start();
         ?>
-            <div class='ginput_container ginput_container_cp_info'>
-                <?php echo esc_html($this->get_field_works_or_expect_msg($this->form_hash_total_field($form))); ?>
-            </div>
+        <div class='ginput_container ginput_container_cp_info'>
+            <?php echo esc_html($this->get_field_works_or_expect_msg($this->form_hash_total_field($form))); ?>
+        </div>
         <?php
         return ob_get_clean();
     }

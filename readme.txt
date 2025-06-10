@@ -4,8 +4,8 @@ Tags: Bitcoin, Ethereum, Cryptocurrency, Payments, Gravity Forms
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable Tag: 1.0.2
-Version: 1.0.2
+Stable Tag: 1.0.3
+Version: 1.0.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -55,6 +55,9 @@ You can easily translate with Loco translate.
 3. Enjoy.
 
 == Changelog ==
+
+= 1.0.3 =
+* Fixed: removed shell_exec requirement
 
 = 1.0.2 =
 * Fixed: _load_textdomain_just_in_time early call

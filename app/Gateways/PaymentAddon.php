@@ -129,6 +129,9 @@ class PaymentAddon extends \GFPaymentAddOn
     // @phpcs:ignore
     public function pre_process_feeds($feeds, $entry, $form): array
     {
+        if (!is_array($feeds)) {
+            return [];
+        }
         $ourFeedIndex = array_search($this->_slug, array_column($feeds, 'addon_slug'), true);
         $feeds[$ourFeedIndex]['meta']['version'] = Helpers::exists() ? 'cryptopay' : 'cryptopay_lite';
         $feeds[$ourFeedIndex]['meta']['transactionType'] = 'product';
